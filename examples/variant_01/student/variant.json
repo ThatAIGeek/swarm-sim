@@ -1,0 +1,19 @@
+{
+  "variant_id": 1,
+  "n_lo": 3,
+  "n_hi": 8,
+  "n_shape": "рівномірний",
+  "wind_max": 4.8,
+  "gust_max": 1.7,
+  "gust_min": 0.5,
+  "goal_dist": [150.0, 150.0],
+  "goal_z": [39.0, 39.0],
+  "cube": [40.0, 40.0, 20.0],
+  "v0_max": 6.0,
+  "duration": 30.0,
+  "hz": 20,
+  "sigma_y": {"body": [3.023449, 0.954673, 0.572989], "world": [4.082102, 4.147768, 0.572989]},
+  "n_stress": 100,
+  "stress_n_range": [8, 10],
+  "stress_wind_max": 6.8
+}

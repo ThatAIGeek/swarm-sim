@@ -1,0 +1,66 @@
+# CI swarm-sim: лінтер, формат вбудованої моделі Рейнольдса, тести (зокрема CLI і живий режим пульта), збірка wheel.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: "1"
+  PYTHONUNBUFFERED: "1"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checks:
+    name: Тести й перевірки
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: true
+
+      - name: Залежності (Python з .python-version, torch — CPU-збірка)
+        run: |
+          uv sync --locked --all-extras
+          uv run python -c "import sys, numpy, onnxruntime; print(sys.version, numpy.__version__, onnxruntime.__version__)"
+
+      - name: Лінтер (ruff, помилки pyflakes F)
+        run: uvx ruff@0.15.20 check .
+
+      - name: Вбудована модель Рейнольдса відповідає формату
+        run: uv run swarm-sim check reynolds
+
+      - name: Тести (pytest)
+        run: uv run pytest tests/ -rs -p no:cacheprovider
+
+      - name: Збірка wheel (модель Рейнольдса всередині)
+        run: |
+          uv build --wheel
+          uv run python - <<'PY'
+          import glob, zipfile
+          w = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(w).namelist()
+          assert "simulator/assets/reynolds.onnx" in names and "simulator/view/page.html" in names, names[:20]
+          print("OK:", w)
+          PY
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: swarm-sim-wheel
+          path: dist/*.whl
+          retention-days: 7

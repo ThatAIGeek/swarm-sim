@@ -1,0 +1,65 @@
+# swarm-sim — симулятор рою квадрокоптерів: модель ONNX + сценарії → запис польоту (parquet), метрики, 3D-пульт.
+#
+#   uv sync                        # .venv: Python 3.11+, залежності й пакет (editable)
+#   uv run swarm-sim --help        # програма (те саме: python -m simulator)
+#   uv run pytest                  # тести (група dev: torch, scikit-learn — для export_torch / export_sklearn)
+#   uv build                       # wheel із вбудованою моделлю Рейнольдса (simulator/assets/reynolds.onnx)
+#
+# Як бібліотека: pip install swarm-sim[export] (експорт моделей PyTorch / scikit-learn у формат симулятора).
+
+[project]
+name = "swarm-sim"
+version = "1.0.0"
+description = "Симулятор рою квадрокоптерів: модель ONNX + сценарії → запис польоту, метрики, 3D-пульт у браузері"
+readme = "README.md"
+license = { text = "MIT" }        # код; дані карти сцени «Кремль» — ODbL (simulator/view/assets/maps/NOTICE)
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.1,<3",
+    "pandas>=2.2,<3",
+    "pyarrow>=18",
+    "pyyaml>=6",
+    "onnx>=1.17",                         # формат моделі (simulator/modelfile.py)
+    "onnxruntime>=1.20",                  # виконання моделей ONNX
+]
+
+[project.optional-dependencies]
+export = ["torch>=2.6", "scikit-learn>=1.6", "skl2onnx>=1.18"]   # export_torch / export_sklearn
+maps = ["pillow>=10", "requests>=2.32"]                            # tools/map_tiles.py, tools/map_vector.py
+
+[project.scripts]
+swarm-sim = "simulator.__main__:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "torch>=2.6", "scikit-learn>=1.6", "skl2onnx>=1.18", "pillow>=10"]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["simulator"]           # разом із page.html, vendor/, assets/ (зокрема reynolds.onnx)
+
+[tool.uv]
+package = true
+default-groups = ["dev"]
+
+# torch без CUDA (≈ 200 МБ замість ≈ 2,5 ГБ): CPU-індекс PyTorch для Linux/Windows, на macOS — PyPI
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform != 'darwin'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+# лінтер у CI: uvx ruff check . (лише помилки pyflakes F)
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["F"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
