@@ -121,14 +121,25 @@ def variant_scenarios(v: dict, seed: int, n: int, n_fixed: int | None = None, ta
     return out
 
 
+def _variant_id(d: Path) -> int | None:
+    try:
+        return int(json.loads((d / "variant.json").read_text(encoding="utf-8"))["variant_id"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
 def find_variant_dir(variant: int, roots=None) -> Path:
-    """Тека даних студента варіанта: variant_XX/student (архів) або data/variant_XX/student (репозиторій)."""
+    """Тека даних студента варіанта: data/ теки student/variant_XX (архів; variant_id у variant.json має
+    збігатися), student/variant_XX/data, а також давніші variant_XX/student і data/variant_XX/student."""
     here = Path(__file__).resolve().parent.parent
+    vv = f"variant_{variant:02d}"
     for r in roots or (Path.cwd(), Path.cwd().parent, here):
-        for p in (r / f"variant_{variant:02d}" / "student", r / "data" / f"variant_{variant:02d}" / "student"):
+        if _variant_id(r / "data") == variant:
+            return r / "data"
+        for p in (r / "student" / vv / "data", r / vv / "student", r / "data" / vv / "student"):
             if (p / "variant.json").exists() or (p / "eval_scenarios.json").exists():
                 return p
-    raise FileNotFoundError(f"не знайдено variant_{variant:02d}/student (дані варіанта з архіву)")
+    raise FileNotFoundError(f"не знайдено даних варіанта {variant} (student/{vv}/data з архіву)")
 
 
 def variant_params(variant: int) -> dict:

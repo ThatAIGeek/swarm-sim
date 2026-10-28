@@ -1,7 +1,8 @@
 # Приклад даних варіанта
 
 `swarm-sim scenarios --variant N`, `swarm-sim view --variant N` і `simulator.scenario_set(N)` шукають теку
-`variant_NN/student/` (або `data/variant_NN/student/`) у поточній теці чи в батьківській:
+`data/` теки варіанта `student/variant_NN/` (або давніші `variant_NN/student/`, `data/variant_NN/student/`)
+у поточній теці чи в батьківській:
 
 - `variant.json` — розподіл стартових умов варіанта: діапазон і розподіл кількості дронів (`n_lo`, `n_hi`,
   `n_shape`: «рівномірний» | «більше малих» | «більше великих»), вітер (`wind_max`), пориви (`gust_min`, `gust_max`),

@@ -40,7 +40,7 @@ uv build --wheel               # dist/swarm_sim-*.whl (модель Рейнол
 ## Команди
 
 ```bash
-swarm-sim scenarios --variant 1 --set eval -o eval.json               # готовий набір варіанта (variant_01/student/)
+swarm-sim scenarios --variant 1 --set eval -o eval.json               # готовий набір варіанта (data/ теки student/variant_01)
 swarm-sim scenarios --variant 1 --seed 7001 --n 100 -o s1.json        # нові стартові умови з параметрами варіанта
 swarm-sim fly --model reynolds --scenarios eval.json -o expert.parquet           # Рейнольдс — верхня межа
 swarm-sim fly --model best.onnx --teacher reynolds --scenarios eval.json -o best.parquet
@@ -60,8 +60,8 @@ swarm-sim view best.parquet [--export best.html]                      # пере
 Помилки (немає файлу, не той формат, неприпустимий параметр) — один рядок «ПОМИЛКА: …» у stderr, код виходу 2;
 трейсбек — із `SWARM_SIM_DEBUG=1`.
 
-**Дані варіанта.** `--variant N` шукає `variant_NN/student/` (або `data/variant_NN/student/`) у поточній теці
-чи батьківській: `variant.json` — розподіл стартових умов (кількість дронів, вітер, пориви, ціль, σ_y для online
+**Дані варіанта.** `--variant N` шукає `data/` теки варіанта (`student/variant_NN/data/`; давніші розкладки
+`variant_NN/student/` і `data/variant_NN/student/` теж підходять) у поточній теці чи батьківській: `variant.json` — розподіл стартових умов (кількість дронів, вітер, пориви, ціль, σ_y для online
 MSE), `eval_scenarios.json` / `stress_scenarios.json` — готові набори. Приклад і опис полів — `examples/`.
 
 **Стандартні умови моделювання** — `simulator/config.yaml`: стартова область, ціль (відстань і висота від центру

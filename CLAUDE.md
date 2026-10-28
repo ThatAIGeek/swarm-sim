@@ -10,7 +10,7 @@
   `modelfile.py` (формат моделі lab4-swarm-model/1, `check`, `export_torch`, `export_sklearn`, відбиток поведінки),
   `engine.py` (`fly`: ролі model / rest_model / teacher, шум дії; `REYNOLDS` — вбудована модель
   `assets/reynolds.onnx`), `record.py`, `stats.py` (метрики із запису), `scenarios.py` (`find_variant_dir` —
-  `variant_XX/student` від поточної теки), `settings.py` + `config.yaml`, `view/` (3D-пульт: `server.py`, `page.html`)
+  `data/` теки `student/variant_XX` від поточної теки), `settings.py` + `config.yaml`, `view/` (3D-пульт: `server.py`, `page.html`)
 - `tools/` — `map_tiles.py`, `map_vector.py`: ресурси сцени «Кремль» (`simulator/view/assets/maps/`)
 - `examples/` — приклад `variant.json`; `tests/` — pytest (`conftest.py` створює дані варіанта 1 у тимчасовій теці)
 
@@ -30,7 +30,7 @@
 ```bash
 uv sync && uv run pytest tests/ -q
 uv run swarm-sim fly --model reynolds --scenarios eval.json -o rec.parquet
-uv run swarm-sim view --model best.onnx --variant 1          # дані: variant_01/student/ у поточній теці
+uv run swarm-sim view --model best.onnx --variant 1          # дані: data/ теки student/variant_01 (поточна тека)
 uv build --wheel                                             # dist/swarm_sim-*.whl
 ```
 

@@ -344,3 +344,22 @@ def test_reynolds_is_package_asset(tmp_path):
     r = run("fly", "--model", "reynolds", "--teacher", "reynolds", "--scenarios", sp, "-o", tmp_path / "r.parquet",
             "--duration", "1", "--quiet")
     assert r.returncode == 0, r.stderr
+
+
+def test_find_variant_dir_layouts(tmp_path, monkeypatch):
+    """Тека студента student/variant_XX: data/ з поточної теки (лише свій variant_id), student/variant_XX/data
+    з теки вище; давніша variant_XX/student теж підходить."""
+    from simulator.scenarios import find_variant_dir
+    d = tmp_path / "student" / "variant_03" / "data"
+    d.mkdir(parents=True)
+    (d / "variant.json").write_text('{"variant_id": 3}', encoding="utf-8")
+    assert find_variant_dir(3, roots=[d.parent]) == d
+    assert find_variant_dir(3, roots=[tmp_path]) == d
+    with pytest.raises(FileNotFoundError):
+        find_variant_dir(4, roots=[d.parent])
+    old = tmp_path / "variant_04" / "student"
+    old.mkdir(parents=True)
+    (old / "variant.json").write_text('{"variant_id": 4}', encoding="utf-8")
+    assert find_variant_dir(4, roots=[tmp_path]) == old
+    monkeypatch.chdir(d.parent)
+    assert find_variant_dir(3) == d

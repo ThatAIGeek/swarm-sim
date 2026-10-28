@@ -172,7 +172,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("scenarios", help="набір сценаріїв (стартових умов) варіанта у файл JSON")
-    p.add_argument("--variant", type=int, required=True, help="номер варіанта (дані — variant_XX/student)")
+    p.add_argument("--variant", type=int, required=True, help="номер варіанта (дані — student/variant_XX/data)")
     p.add_argument("--set", choices=["eval", "stress"], default=None,
                    help="готовий набір з архіву (eval — 30 публічних, N = 5; stress — стрес-набір, N = 8–10)")
     p.add_argument("--seed", type=int, default=None, help="зерно нових сценаріїв (≥ 0)")
