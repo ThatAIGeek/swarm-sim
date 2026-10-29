@@ -1,0 +1,98 @@
+/* Core System skin for Leaflet 1.9 maps. Load after Leaflet's own CSS and Core's tokens.css.
+   Leaflet is not part of the kit: vendor it into the project (leaflet.js, leaflet.css, images/) so pages stay offline.
+   Controls, popups and tooltips use Core surfaces; tiles stay as they are by day.
+   Map container classes:
+     cs-map-night  streets at night (inverts street tiles)        cs-map-auto  same, only in the dark theme
+     cs-map-dim    imagery at night (darkens, never inverts)     cs-map-dim-auto  same, only in the dark theme
+   Never invert orthophoto or satellite imagery. */
+
+:root {
+  --map-night-filter: brightness(0.62) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.72);
+  --map-dim-filter: brightness(0.78) contrast(1.08) saturate(0.8);
+}
+
+.leaflet-container {
+  background: var(--ground, var(--surface));
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+.cs-map-night .leaflet-tile-pane,
+[data-theme="dark"] .cs-map-auto .leaflet-tile-pane { filter: var(--map-night-filter); }
+.cs-map-dim .leaflet-tile-pane,
+[data-theme="dark"] .cs-map-dim-auto .leaflet-tile-pane { filter: var(--map-dim-filter); }
+
+/* controls: zoom, layers, custom buttons. Selectors include .leaflet-container / .leaflet-touch so they
+   outrank Leaflet's own touch rules (which otherwise force 30 px buttons and remove the shadow). */
+.leaflet-container .leaflet-bar,
+.leaflet-touch .leaflet-bar,
+.leaflet-container .leaflet-control-layers,
+.leaflet-touch .leaflet-control-layers {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-overlay);
+  background-clip: padding-box;
+  box-shadow: var(--shadow-overlay);
+}
+.leaflet-container .leaflet-bar a,
+.leaflet-touch .leaflet-bar a {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  border-bottom-color: var(--line);
+  background: var(--surface-overlay);
+  color: var(--ink);
+}
+@media (pointer: coarse) {
+  .leaflet-container .leaflet-bar a,
+  .leaflet-touch .leaflet-bar a { width: 40px; height: 40px; line-height: 40px; }
+}
+.leaflet-container .leaflet-bar a:hover,
+.leaflet-container .leaflet-bar a:focus { background: var(--wash); color: var(--ink); }
+.leaflet-container .leaflet-bar a:focus-visible,
+.leaflet-container .leaflet-control-layers-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--focus-halo), 0 0 0 4px var(--focus);
+  position: relative;
+  z-index: 1;
+}
+.leaflet-container .leaflet-bar a.leaflet-disabled { color: var(--ink-disabled); background: var(--surface-overlay); }
+.leaflet-container .leaflet-control-layers-expanded { padding: var(--space-2) var(--space-3); color: var(--ink); }
+.leaflet-container .leaflet-control-layers-separator { border-top-color: var(--line); }
+
+/* popups and tooltips */
+.leaflet-container .leaflet-popup-content-wrapper {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-overlay);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+}
+.leaflet-container .leaflet-popup-content { margin: var(--space-3); font-size: 14px; line-height: 20px; }
+.leaflet-container .leaflet-popup-tip { background: var(--surface-overlay); box-shadow: none; border: 1px solid var(--line); }
+.leaflet-container a.leaflet-popup-close-button { color: var(--ink-muted); }
+.leaflet-container .leaflet-tooltip {
+  border: 1px solid var(--overlay-line);
+  border-radius: var(--radius-xs);
+  background: var(--overlay);
+  color: var(--overlay-ink);
+  box-shadow: none;
+  font-size: 12px;
+}
+.leaflet-container .leaflet-tooltip-top::before { border-top-color: var(--overlay); }
+.leaflet-container .leaflet-tooltip-bottom::before { border-bottom-color: var(--overlay); }
+.leaflet-container .leaflet-tooltip-left::before { border-left-color: var(--overlay); }
+.leaflet-container .leaflet-tooltip-right::before { border-right-color: var(--overlay); }
+
+/* attribution: small, readable over any tile */
+.leaflet-container .leaflet-control-attribution {
+  background: var(--overlay);
+  color: var(--overlay-muted);
+  font-size: 11px;
+}
+.leaflet-container .leaflet-control-attribution a { color: var(--overlay-ink); }
+
+/* features: selected outline, and a visible keyboard focus cue (Leaflet sets none) */
+.cs-map-selected { stroke: var(--overlay-focus); }
+.leaflet-container path.leaflet-interactive:focus-visible { outline: none; stroke: var(--overlay-focus); stroke-width: 4px; }
+.leaflet-container .leaflet-marker-icon:focus-visible { outline: 2px solid var(--overlay-focus); outline-offset: 2px; }

@@ -1,0 +1,130 @@
+/* Core System v4, generated 2026-10-29 by tools/export.js. Do not edit; edit project/tokens.json and re-run. */
+:root, [data-theme="light"] {
+  --surface: #f4efe6;
+  --surface-panel: #ece5d8;
+  --surface-raised: #ffffff;
+  --surface-overlay: #ffffff;
+  --surface-lab: #faf7f2;
+  --scrim: rgba(42, 37, 32, 0.5);
+  --wash: rgba(42, 37, 32, 0.08);
+  --ink: #2a2520;
+  --ink-muted: #6b6259;
+  --ink-disabled: #a39a8f;
+  --line: #cfc3af;
+  --primary: #8a4b2e;
+  --primary-hover: #733d24;
+  --primary-tint: #ead8cc;
+  --on-fill: #ffffff;
+  --accent: #526a4c;
+  --accent-tint: #dfe5d6;
+  --danger: #a8204d;
+  --danger-tint: #f4dadf;
+  --success: #2c5d7c;
+  --success-tint: #d9e5ec;
+  --warning: #705a00;
+  --warning-tint: #f0e3c8;
+  --focus: var(--primary);
+  --focus-halo: var(--surface-raised);
+  --data-1: #8a4b2e;
+  --data-2: #26937d;
+  --data-3: #6869cf;
+  --data-4: #a87410;
+  --data-5: #5d2267;
+  --data-6: #2a2520;
+  --data-7: #618699;
+  --data-8: #2433b8;
+  --data-seq-1: #440154;
+  --data-seq-2: #3b528b;
+  --data-seq-3: #21918c;
+  --data-seq-4: #5ec962;
+  --data-seq-5: #fde725;
+  --data-div-1: #2c5d7c;
+  --data-div-2: #8fb2c9;
+  --data-div-3: #f4efe6;
+  --data-div-4: #c99a80;
+  --data-div-5: #8a4b2e;
+  --data-heat-1: #0d0887;
+  --data-heat-2: #7e03a8;
+  --data-heat-3: #cc4778;
+  --data-heat-4: #f89540;
+  --data-heat-5: #f0f921;
+  --stage: #121110;
+  --overlay: rgba(18, 17, 16, 0.86);
+  --overlay-ink: #efe8dc;
+  --overlay-muted: #b3a897;
+  --overlay-line: rgba(239, 232, 220, 0.18);
+  --overlay-focus: #d08a66;
+  --overlay-focus-halo: var(--stage);
+  --shadow-overlay: 0 8px 24px rgba(42, 37, 32, 0.18);
+}
+[data-theme="dark"] {
+  --surface: #1c1915;
+  --surface-panel: #28231d;
+  --surface-raised: #332d26;
+  --surface-overlay: #38312a;
+  --surface-lab: #16140f;
+  --scrim: rgba(0, 0, 0, 0.6);
+  --wash: rgba(239, 232, 220, 0.06);
+  --ink: #efe8dc;
+  --ink-muted: #b3a897;
+  --ink-disabled: #7a7064;
+  --line: #4b4339;
+  --primary: #d08a66;
+  --primary-hover: #dc9a78;
+  --primary-tint: #3d2a1f;
+  --on-fill: #2a1409;
+  --accent: #9db894;
+  --accent-tint: #33402f;
+  --danger: #f28ca2;
+  --danger-tint: #4a2620;
+  --success: #8fbfdc;
+  --success-tint: #223640;
+  --warning: #e3b25e;
+  --warning-tint: #443419;
+  --data-1: #d08a66;
+  --data-2: #3a9a8f;
+  --data-3: #8c89f0;
+  --data-4: #e2cb52;
+  --data-5: #eba6d8;
+  --data-6: #efe8dc;
+  --data-7: #5a85b9;
+  --data-8: #d4e6a0;
+  --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+:root {
+  --space-half: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1200px;
+  --measure: 68ch;
+  --content-max: 1200px;
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --font-serif: "Lora", Georgia, "Times New Roman", serif;
+  --font-sans: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Mono", ui-monospace, monospace;
+}
+:root, [data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+@font-face { font-family: "Lora"; src: url("fonts/Lora-wght.ttf") format("truetype"); font-weight: 400 700; font-style: normal; }
+@font-face { font-family: "Lora"; src: url("fonts/Lora-Italic-wght.ttf") format("truetype"); font-weight: 400 700; font-style: italic; }
+@font-face { font-family: "Golos Text"; src: url("fonts/GolosText-wght.ttf") format("truetype"); font-weight: 400 900; font-style: normal; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/IBMPlexMono-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/IBMPlexMono-Medium.ttf") format("truetype"); font-weight: 500; font-style: normal; }

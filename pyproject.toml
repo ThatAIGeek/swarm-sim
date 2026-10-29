@@ -38,7 +38,7 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["simulator"]           # разом із page.html, vendor/, assets/ (зокрема reynolds.onnx)
+packages = ["simulator"]           # разом із page.html, core/ (Core System), vendor/, assets/ (зокрема reynolds.onnx)
 
 [tool.uv]
 package = true

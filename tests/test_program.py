@@ -1,5 +1,6 @@
 """Симулятор як програма: формат моделі ONNX, вбудований Рейнольдс, політ і запис, CLI, візуальний режим."""
 import json
+import re
 import subprocess
 import sys
 import urllib.request
@@ -277,10 +278,28 @@ def test_page_has_effects_controls():
     assert 'id="fxSel"' in html
     assert 'id="fxCrash"' in html and 'id="fxDrone"' in html and "function fxDrone" in html
     assert 'id="lyMarkers"' in html and "st.layers.markers" in html       # маркери дронів вимикаються
-    assert all(f'id="tip{k}" role="tooltip"' in html for k in ("Ms", "Mse", "Phi"))   # підказки до графіків
+    assert all(f'<cs-info slot="toolbar" id="tip{k}"' in html for k in ("Ms", "Mse", "Phi"))   # підказки до графіків
     for mode in ("fire", "boom", "off"):
         assert f'<option value="{mode}">' in html
     assert "function fxExplosion" in html and "function fxShell" in html
+
+
+def test_page_inlines_core_system():
+    """Пульт — один рядок HTML: Core System (стилі, компоненти, шрифти) і three.js вбудовані, жодного зовнішнього
+    файлу чи CDN; копія набору в пакеті — з ліцензіями шрифтів та іконок."""
+    from simulator.view import server
+    html = server.render({"P": {}, "sets": {}, "controllers": []})
+    assert "<!--__CORE__-->" not in html and "/*__THREE__*/" not in html
+    assert "customElements" in html and "--surface-lab" in html and "@font-face" in html
+    assert 'data-style="lab"' in html and '<html lang="uk">' in html
+    assert re.search(r'<(?:link|script)[^>]+(?:href|src)="https?://', html) is None
+    core = server.CORE
+    for f in ("tokens-embedded-lab.css", "components/bundle.css", "components/bundle.js", "LICENSE-lucide.txt",
+              "fonts/OFL-GolosText.txt", "fonts/OFL-IBMPlexMono.txt"):
+        assert (core / f).is_file(), f
+    stamp = (core / "tokens.css").read_text(encoding="utf-8").splitlines()[0]
+    assert stamp.startswith("/* Core System v") and stamp == (core / "tokens-embedded-lab.css").read_text(
+        encoding="utf-8").splitlines()[0]
 
 
 def test_reference_map_keys_and_teacher_group():

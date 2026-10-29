@@ -1,0 +1,48 @@
+/* Bridge from ortophoto's ui-tokens.css to Core System, for migrating a page gradually.
+   Load AFTER core/tokens.css and INSTEAD OF ui-tokens.css: the page's existing classes keep working,
+   now drawn in Core colours, type and sizes, while you swap them for Core components one at a time.
+   One rename is needed in the page's own CSS: box-shadow: var(--focus) -> box-shadow: var(--focus-ring)
+   (Core's --focus is a colour, not a box-shadow). Delete this file when the page no longer uses --bg-*, --tx-* or --acc. */
+:root, [data-theme], [data-style], [data-density] {
+  --bg-0: var(--ground, var(--surface));
+  --bg-1: var(--panel, var(--surface-raised));
+  --bg-2: var(--surface-panel);
+  --bg-3: var(--wash);
+  --glass: var(--surface-overlay);
+  --glass-blur: none;
+  --line-2: var(--ink-muted);
+  --tx-1: var(--ink);
+  --tx-2: var(--ink-muted);
+  --tx-3: var(--ink-muted);
+  --tx-on-acc: var(--on-fill);
+  --acc: var(--primary);
+  --acc-2: var(--primary-hover);
+  --acc-bg: var(--primary-tint);
+  --focus-ring: 0 0 0 2px var(--focus-halo), 0 0 0 4px var(--focus);
+  --ok: var(--success);
+  --ok-bg: var(--success-tint);
+  --warn: var(--warning);
+  --warn-bg: var(--warning-tint);
+  --bad: var(--danger);
+  --bad-bg: var(--danger-tint);
+  --idle: var(--ink-muted);
+  --cat-1: var(--data-1); --cat-2: var(--data-2); --cat-3: var(--data-3); --cat-4: var(--data-4);
+  --cat-5: var(--data-5); --cat-6: var(--data-6); --cat-7: var(--data-7); --cat-8: var(--data-8);
+  --ramp-bad: linear-gradient(90deg, var(--data-heat-1), var(--data-heat-2), var(--data-heat-3), var(--data-heat-4), var(--data-heat-5));
+  --ramp-seq: linear-gradient(90deg, var(--data-seq-1), var(--data-seq-2), var(--data-seq-3), var(--data-seq-4), var(--data-seq-5));
+  --font: var(--font-sans);
+  --mono: var(--font-mono);
+  --fs-xs: var(--t-caption-size, 13px);
+  --fs-sm: var(--t-body-sm-size, 14px);
+  --fs-md: var(--t-body-sm-size, 14px);
+  --fs-lg: var(--t-label-size, 14px);
+  --fs-xl: var(--t-heading-3-size, 20px);
+  --fs-2xl: var(--t-figure-size, 22px);
+  --lh: 1.45;
+  --s-1: var(--space-1); --s-2: var(--space-2); --s-3: var(--space-3);
+  --s-4: var(--space-4); --s-5: var(--space-6); --s-6: var(--space-8);
+  --r-1: var(--radius-sm); --r-2: var(--radius-sm); --r-3: var(--radius-container, var(--radius-md)); --r-pill: var(--radius-pill);
+  --h-ctl: var(--control-h, 32px);
+  --shadow: var(--shadow-overlay);
+}
+/* --line and --scrim mean the same in both systems and need no bridge. */

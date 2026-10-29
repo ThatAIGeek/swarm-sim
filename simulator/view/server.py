@@ -44,6 +44,7 @@ from ..scenarios import find_variant_dir, load_scenarios, make_scenario, scenari
 from ..sensors import K_MAX, N_MAX_A, R_DETECT
 from ..settings import DURATION
 from ..stats import GOAL_RADIUS, frame_telemetry, metrics, row_errors
+from . import core_static
 from .episode import b64, clamp_goal, goal_r_max, run_episode
 from .maps import player_maps
 
@@ -54,6 +55,7 @@ FREE_N = (2, 16)                 # N у вільному режимі пульт
 HERE = Path(__file__).resolve().parent
 PAGE = HERE / "page.html"
 THREE = HERE / "vendor" / "three-0.147.0"
+CORE = HERE / "core"               # Core System (дизайн-система): токени, компоненти, шрифти — копія dist/core
 ASSETS = HERE / "assets"
 ROOT = HERE.parent.parent          # корінь репозиторію (або site-packages) — лише щоб прибрати шляхи з повідомлень
 
@@ -85,11 +87,13 @@ def _script(js: str) -> str:
 
 
 def render(payload: dict) -> str:
-    """Сторінка пульта з вбудованими three.js і даними."""
+    """Сторінка пульта з вбудованими Core System (стилі, компоненти, шрифти), three.js і даними — один рядок HTML
+    і для живого режиму, і для --export: сторінка працює без мережі й без інших файлів."""
     p = dict(payload, logos=logos(), maps=player_maps())
     html = PAGE.read_text(encoding="utf-8")
     data = json.dumps(p, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    for key, val in (("/*__THREE__*/", _script((THREE / "three.min.js").read_text(encoding="utf-8"))),
+    for key, val in (("<!--__CORE__-->", core_static.inline(str(CORE))),
+                     ("/*__THREE__*/", _script((THREE / "three.min.js").read_text(encoding="utf-8"))),
                      ("/*__ORBIT__*/", _script((THREE / "OrbitControls.js").read_text(encoding="utf-8"))),
                      ("/*__DATA__*/null", data)):
         assert html.count(key) == 1, key

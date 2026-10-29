@@ -1,0 +1,47 @@
+/* Core System skin for MapLibre GL (farsight's Обрій viewer). Load after maplibre-gl.css and Core's tokens.css.
+   Covers controls, popups, attribution and the scale bar. Vector-style colours live in the map style JSON:
+   read them from Core with CoreSystem.readToken() when building the style. Cesium keeps its own re-skin;
+   run it through bridge-ui-tokens.css until it is rewritten. */
+
+.maplibregl-map { font-family: var(--font-sans); color: var(--ink); }
+
+.maplibregl-ctrl-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-overlay);
+  box-shadow: var(--shadow-overlay);
+}
+.maplibregl-ctrl-group:not(:empty) { box-shadow: var(--shadow-overlay); }
+.maplibregl-ctrl-group button { width: 32px; height: 32px; background-color: transparent; }
+.maplibregl-ctrl-group button + button { border-top: 1px solid var(--line); }
+.maplibregl-ctrl-group button:not(:disabled):hover { background-color: var(--wash); }
+.maplibregl-ctrl-group button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--focus-halo), 0 0 0 4px var(--focus); }
+@media (pointer: coarse) { .maplibregl-ctrl-group button { width: 40px; height: 40px; } }
+/* the built-in icons are dark SVG backgrounds: lighten them in the dark theme */
+[data-theme="dark"] .maplibregl-ctrl button .maplibregl-ctrl-icon { filter: invert(1) brightness(0.9); }
+
+.maplibregl-popup-content {
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-overlay);
+  color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+  font-size: 14px;
+  line-height: 20px;
+}
+.maplibregl-popup-close-button { color: var(--ink-muted); font-size: 18px; padding: 0 var(--space-1); }
+.maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: var(--surface-overlay); }
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: var(--surface-overlay); }
+.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--surface-overlay); }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--surface-overlay); }
+
+.maplibregl-ctrl.maplibregl-ctrl-attrib { background: var(--overlay); color: var(--overlay-muted); font-size: 11px; }
+.maplibregl-ctrl-attrib a { color: var(--overlay-ink); }
+.maplibregl-ctrl-scale {
+  border-color: var(--overlay-ink);
+  background: var(--overlay);
+  color: var(--overlay-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}

@@ -56,6 +56,8 @@ jobs:
           w = glob.glob("dist/*.whl")[0]
           names = zipfile.ZipFile(w).namelist()
           assert "simulator/assets/reynolds.onnx" in names and "simulator/view/page.html" in names, names[:20]
+          assert "simulator/view/core_static.py" in names and "simulator/view/core/tokens-embedded-lab.css" in names
+          assert "simulator/view/core/components/bundle.js" in names and "simulator/view/core/fonts/OFL-GolosText.txt" in names
           print("OK:", w)
           PY
 

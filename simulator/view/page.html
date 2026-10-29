@@ -4,280 +4,173 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Пульт рою ЛР4</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='4' cy='5' r='2.2' fill='%232f86e0'/%3E%3Ccircle cx='12' cy='5' r='2.2' fill='%232f86e0'/%3E%3Cpath d='M8 9l2.4 2.4L8 13.8 5.6 11.4z' fill='%23e8860c'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='4' cy='5' r='2.2' fill='%2326937d'/%3E%3Ccircle cx='12' cy='5' r='2.2' fill='%2326937d'/%3E%3Cpath d='M8 9l2.4 2.4L8 13.8 5.6 11.4z' fill='%238a4b2e'/%3E%3C/svg%3E">
+<!--__CORE__-->
 <style>
 /* Візуальний режим симулятора swarm-sim: зліва — постановка (сценарій, ціль, модель, драбина), у центрі — полігон
    (3D), справа — вимірювання (метрики епізоду, довідкові числа, пакетний прогін), знизу — шкала часу з телеметрією.
-   Політ рахує рушій симулятора в Python (той самий, що й без пульта); сторінка лише показує кадри. Сцена завжди
-   «вечірній полігон»; панелі йдуть за темою переглядача. */
-:root{
-  --bg:#eef1f5; --panel:#ffffff; --ink:#142033; --muted:#5a6579; --line:#dce2ea; --field:#7d8aa0; --soft:#f2f5f9;
-  --accent:#1f5fbf; --accent-ink:#ffffff; --head:#09111d; --head-ink:#e8edf5; --head-muted:#9fb0c8;
-  --expert:#2f86e0; --nn:#e8860c; --ok:#1d9a55; --warn:#c48600; --bad:#d23c3c; --goal:#22a565;
-  /* текст пігулок і значків стану: у світлій темі затемнений до контрасту ≥ 4,5:1 (WCAG AA) */
-  --ok-ink:#126b3a; --warn-ink:#7a5300; --bad-ink:#a42727; --nn-ink:#8f4d00; --ex-ink:#1b5596;
-  --stage:#0c1420; --stage-ink:#dfe7f3; --chart-grid:#e6eaf0; --series:#1d2a44;
-  --mono:ui-monospace,"SFMono-Regular","Cascadia Mono","DejaVu Sans Mono",Consolas,monospace;
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Helvetica Neue",Arial,sans-serif;
-  /* кольори сцени (вона завжди темна): ті самі, що в COL / матеріалах three.js, — легенда їх і бере */
-  --st-expert:#2f86e0; --st-nn:#e8860c; --st-goal:#2fbf72; --st-bad:#f05252; --st-dead:#8a94a6;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0c121b; --panel:#131b26; --ink:#e5ebf3; --muted:#93a1b6; --line:#243142; --field:#66789a; --soft:#1a2432;
-  --accent:#6a9df0; --accent-ink:#081120; --head:#060a11; --head-ink:#e8edf5; --head-muted:#8d9db4;
-  --expert:#5aa4f2; --nn:#f39b2f; --ok:#3cc27a; --warn:#e2a92a; --bad:#f06262; --goal:#3cc27a;
-  --ok-ink:#5fd493; --warn-ink:#f0bd4a; --bad-ink:#ff8080; --nn-ink:#f7ad55; --ex-ink:#7cb8f6;
-  --stage:#0a111b; --stage-ink:#dfe7f3; --chart-grid:#223042; --series:#dfe7f3; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0c121b; --panel:#131b26; --ink:#e5ebf3; --muted:#93a1b6; --line:#243142; --field:#66789a; --soft:#1a2432;
-  --accent:#6a9df0; --accent-ink:#081120; --head:#060a11; --head-ink:#e8edf5; --head-muted:#8d9db4;
-  --expert:#5aa4f2; --nn:#f39b2f; --ok:#3cc27a; --warn:#e2a92a; --bad:#f06262; --goal:#3cc27a;
-  --ok-ink:#5fd493; --warn-ink:#f0bd4a; --bad-ink:#ff8080; --nn-ink:#f7ad55; --ex-ink:#7cb8f6;
-  --stage:#0a111b; --stage-ink:#dfe7f3; --chart-grid:#223042; --series:#dfe7f3; color-scheme:dark}
+   Політ рахує рушій симулятора в Python (той самий, що й без пульта); сторінка лише показує кадри.
+   Оформлення — Core System (стиль Lab; сервер вбудовує її на місце маркера в head): кольори, шрифти й компоненти
+   cs-*. Панелі йдуть за темою переглядача; полігон (#stage, data-theme="dark") завжди темний, і його HUD — на overlay.
+   Власні правила лишились для макета, HUD над сценою й рядка відтворення (компонента для нього в системі ще немає). */
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{font:14px/1.45 var(--sans);color:var(--ink);background:var(--bg)}
-button,select,input{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#stage :focus-visible{outline-color:#fff}                       /* на темній сцені синя рамка фокуса не видна */
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-#app{display:grid;height:100%;grid-template-columns:300px minmax(0,1fr) 340px;grid-template-rows:auto minmax(0,1fr) 210px;
+body{font:14px/1.45 var(--font-sans);color:var(--ink);background:var(--surface-lab)}
+code{font:.92em var(--font-mono)}
+[hidden]{display:none!important}
+#app{display:grid;height:100%;grid-template-columns:300px minmax(0,1fr) 340px;grid-template-rows:auto minmax(0,1fr) 230px;
   grid-template-areas:"head head head" "side stage right" "side dash right"}
-header{grid-area:head;background:var(--head);color:var(--head-ink);display:flex;align-items:center;gap:14px;
-  padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top,0px));min-width:0}
-.brand{display:flex;flex-direction:column;min-width:0;flex:1}
-.brand h1{margin:0;font-size:16px;font-weight:650;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand .sub{font-size:12px;color:var(--head-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.logos{display:flex;align-items:center;gap:10px;flex:none}
-.logos img{height:40px;width:auto;border-radius:6px}
-.mode{font:600 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:999px;
-  border:1px solid currentColor;color:var(--head-muted);white-space:nowrap;flex:none}
-.mode.teacher{color:#f3b45a}
-.iconbtn{background:transparent;border:1px solid #2a3a52;color:var(--head-ink);border-radius:8px;padding:6px 9px;cursor:pointer;flex:none}
-.iconbtn:hover{background:#16243a}
-header :focus-visible{outline-color:#fff}
-aside{background:var(--panel);overflow-y:auto;min-width:0}
-#side{grid-area:side;border-right:1px solid var(--line);padding:4px 14px 20px}
-#right{grid-area:right;border-left:1px solid var(--line);padding:4px 14px 20px}
-section.blk{border-bottom:1px solid var(--line);padding:10px 0 12px}
+#head{grid-area:head;min-width:0}
+.logos{display:flex;align-items:center;gap:var(--space-2)}
+.logos img{height:36px;width:auto;border-radius:var(--radius-sm)}
+aside{background:var(--surface-raised);overflow-y:auto;min-width:0}
+#side{grid-area:side;border-right:1px solid var(--line);padding:var(--space-1) var(--space-3) var(--space-6)}
+#right{grid-area:right;border-left:1px solid var(--line);padding:var(--space-1) var(--space-3) var(--space-6)}
+section.blk{border-bottom:1px solid var(--line);padding:var(--space-3) 0}
 section.blk:last-child{border-bottom:0}
-h2{font-size:11.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:2px 0 8px;
-  display:flex;justify-content:space-between;align-items:center;gap:8px}
-label.f{display:block;font-size:12.5px;color:var(--muted);margin:8px 0 3px}
-select,input[type=number]{width:100%;padding:6px 8px;border:1px solid var(--field);border-radius:7px;background:var(--panel)}
-input[type=range]{width:100%;accent-color:var(--accent)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-button.b{border:1px solid var(--field);background:var(--panel);border-radius:7px;padding:6px 10px;cursor:pointer}
-button.b:hover{background:var(--soft)}
-button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
-button.primary:hover{filter:brightness(1.07);background:var(--accent)}
-button:disabled{opacity:.55;cursor:default}
-.seg{display:flex;border:1px solid var(--field);border-radius:8px;overflow:hidden}
-.seg button{flex:1;border:0;background:var(--panel);padding:6px 4px;cursor:pointer;font-size:12.5px;white-space:nowrap}
-.seg button+button{border-left:1px solid var(--field)}
-.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);font-weight:600}
-.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
-details.more{margin-top:8px;font-size:12px;color:var(--muted)}
-details.more summary{cursor:pointer;color:var(--ink);font-size:12.5px}
-details.more p{margin:6px 0 0}
-.chk{display:flex;flex-wrap:wrap;gap:4px 14px}
-.chk label{display:inline-flex;gap:6px;align-items:center;font-size:13px}
-.ladder-v{font:600 17px/1.2 var(--sans);font-variant-numeric:tabular-nums}
-.ladder-v small{font-size:12px;color:var(--muted);font-weight:500}
-#drop{border:1.5px dashed var(--field);border-radius:10px;padding:10px;text-align:center;font-size:12.5px;color:var(--muted)}
-#drop.over{border-color:var(--accent);background:var(--soft)}
-.err{margin-top:8px;border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);background:color-mix(in srgb,var(--bad) 8%,transparent);
-  color:var(--ink);border-radius:8px;padding:7px 9px;font-size:12.5px}
-.err b{color:var(--bad-ink)} .err details{margin-top:4px;color:var(--muted);font-size:11.5px} .err pre{white-space:pre-wrap;word-break:break-all;margin:4px 0 0;font:11px/1.35 var(--mono)}
-.mine{display:flex;flex-direction:column;gap:4px;margin-top:8px}
-.mine div{display:flex;justify-content:space-between;gap:6px;align-items:center;font-size:12.5px;background:var(--soft);border-radius:7px;padding:5px 8px}
-.mine b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pill{text-transform:none;letter-spacing:0;display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--soft);color:var(--muted);white-space:nowrap}
-.pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok-ink)}
-.pill.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad-ink)}
-.pill.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn-ink)}
-.pill.nn{background:color-mix(in srgb,var(--nn) 18%,transparent);color:var(--nn-ink)}
-.pill.ex{background:color-mix(in srgb,var(--expert) 18%,transparent);color:var(--ex-ink)}
+section.blk>:is(cs-select,cs-text-field,cs-slider,cs-checkbox,cs-disclosure,cs-key-value,cs-stat-group,cs-banner,.row,.row3,.chk,#drop,.refline){margin-top:var(--space-3)}
+h2{font:500 12px/1.3 var(--font-mono);letter-spacing:.04em;color:var(--ink-muted);margin:0;
+  display:flex;justify-content:space-between;align-items:center;gap:var(--space-2)}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);align-items:end}
+.row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-2);align-items:end}
+aside :is(cs-text-field,cs-select){min-width:0}
+aside .cs-field{grid-template-columns:minmax(0,1fr)}       /* узкі колонки: поле стискається, а не розпирає панель */
+aside .cs-field :is(input,select){min-width:0;width:100%}
+.hint{font-size:13px;color:var(--ink-muted);margin:var(--space-2) 0 0}
+.chk{display:flex;flex-direction:column;gap:var(--space-1)}
+.ladder-v{font:500 16px/1.2 var(--font-mono);font-variant-numeric:tabular-nums;margin-top:var(--space-2)}
+.ladder-v small{font-size:13px;color:var(--ink-muted)}
+/* поле завантаження моделі — своє, доки в системі немає компонента для перетягування файлів */
+#drop{border:1px dashed var(--ink-muted);border-radius:var(--radius-sm);padding:var(--space-3);text-align:center;font-size:13px;color:var(--ink-muted)}
+#drop.over{border-color:var(--primary);background:var(--primary-tint)}
+#drop cs-button{margin-top:var(--space-2)}
+#mineErr pre{white-space:pre-wrap;word-break:break-all;margin:var(--space-1) 0 0;font:12px/1.35 var(--font-mono)}
+.mine{display:flex;flex-direction:column;gap:var(--space-1);margin-top:var(--space-2)}
+.mine div{display:flex;justify-content:space-between;gap:var(--space-2);align-items:center;font-size:13px;background:var(--wash);border-radius:var(--radius-sm);padding:var(--space-1) var(--space-2)}
+.mine b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ---- полігон: #view — canvas і HUD; #bar — перемикач сцени, легенда й камери (на телефоні — рядок під сценою) */
-#stage{grid-area:stage;position:relative;background:var(--stage);min-height:0;overflow:hidden;color:var(--stage-ink)}
+#stage{grid-area:stage;position:relative;min-height:0;overflow:hidden}
 #view{position:absolute;inset:0}
 #bar{display:contents}
 #gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
-#gl:focus{outline:none} #gl:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+#gl:focus{outline:none}
+#gl:focus-visible{outline:2px solid var(--overlay-focus);outline-offset:-4px;box-shadow:inset 0 0 0 2px var(--overlay-focus-halo)}
 #gl.pick{cursor:crosshair}
-#gPick[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
-.hud{position:absolute;color:var(--stage-ink);font-variant-numeric:tabular-nums;pointer-events:none;text-shadow:0 1px 2px #000a}
-#hudTL{left:12px;top:10px;background:#0b1320b3;border-radius:9px;padding:6px 10px;max-width:calc(50% - 112px)}   /* не під перемикачем сцени */
-#hudTL .t{font:650 26px/1 var(--sans)}
-#hudTL .t small{font-size:13px;font-weight:500;opacity:.7}
-#hudTL .s{font-size:12.5px;opacity:.85;margin-top:4px}
-#hBusy{color:#ffd27a;opacity:1!important}
+.hud{position:absolute;font-variant-numeric:tabular-nums;pointer-events:none}
+#hudTL{left:12px;top:10px;max-width:calc(50% - 130px)}   /* не під перемикачем сцени */
+#hudTL .t{font:500 24px/1 var(--font-mono)}
+#hudTL .t small{font-size:13px;color:var(--overlay-muted)}
+#hudTL .s{font-size:13px;color:var(--overlay-muted);margin-top:var(--space-1)}
+#hBusy{color:var(--warning)!important}
 #hBusy::before{content:"";display:inline-block;width:9px;height:9px;margin-right:6px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-1px}
 @keyframes spin{to{transform:rotate(360deg)}}
-#hudTR{right:12px;top:10px;text-align:right}
-#sceneSw{position:absolute;left:50%;top:10px;transform:translateX(-50%);display:flex;gap:0;pointer-events:auto;z-index:2;
-  border:1px solid #2b3d57;border-radius:9px;overflow:hidden;box-shadow:0 2px 8px #0005}
-#sceneSw button{background:#0e1a2bd9;color:var(--stage-ink);border:0;padding:6px 14px;font-size:13px;cursor:pointer}
-#sceneSw button+button{border-left:1px solid #2b3d57}
-#sceneSw button[aria-pressed=true]{background:#2a4e8a;font-weight:600}
-/* плашка нестандартного стану й тости — під перемикачем сцени й HUD, щоб нічого не перекривати */
-#topC{position:absolute;left:50%;top:88px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;
-  width:max-content;max-width:calc(100% - 260px);z-index:5;pointer-events:none}   /* над #busy: плашку можна натиснути й під час перерахунку */
-#goalBanner{pointer-events:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;background:#3d2e05ee;color:#ffe7a3;
-  border:1px solid #c79a26;border-radius:9px;padding:5px 6px 5px 12px;font-size:13px;box-shadow:0 2px 8px #0006}
-#goalBanner button{background:#ffd56a;color:#2a1f00;border:0;border-radius:7px;padding:4px 10px;font-weight:600;cursor:pointer}
-#toast{pointer-events:auto;display:flex;align-items:flex-start;gap:8px;background:#0f2a1ae6;color:#d6f5e3;border:1px solid #2a7a4a;
-  padding:6px 6px 6px 12px;border-radius:8px;font-size:13px;transition:opacity .25s;opacity:0;visibility:hidden;max-width:100%;user-select:text}
-#toast.on{opacity:1;visibility:visible}
-#toast.bad{background:#3a0f12ee;color:#ffd9d9;border-color:#a33} #toast.info{background:#0e1a2bee;color:var(--stage-ink);border-color:#2b3d57}
-#toast button{background:transparent;border:0;color:inherit;font-size:16px;line-height:1;padding:0 4px;cursor:pointer;opacity:.8}
-#botRow{position:absolute;left:12px;right:12px;bottom:10px;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap;pointer-events:none;z-index:2}
-#hudBL{position:static;background:#0b1320cc;border-radius:9px;padding:5px 10px;font-size:12px;display:flex;gap:4px 12px;flex-wrap:wrap;max-width:100%}
-#hudBL span{white-space:nowrap}
-#hudBL svg{vertical-align:-1px;margin-right:5px}
-.rcol{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;position:relative}
+#hudTR{right:12px;top:10px;padding:0;background:none;border:0}
+#sceneSw{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:2}
+/* плашка нестандартної цілі — під перемикачем сцени й HUD, щоб нічого не перекривати; над спінером перерахунку */
+#topC{position:absolute;left:50%;top:76px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 280px);z-index:5}
+#goalBanner{background:var(--surface-overlay);box-shadow:var(--shadow-overlay)}
+#botRow{position:absolute;left:12px;right:12px;bottom:10px;display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-2);flex-wrap:wrap;pointer-events:none;z-index:2}
+#hudBL{pointer-events:auto;max-width:100%}
+.rcol{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2);margin-left:auto;position:relative}
 #attrib:empty{display:none}
-#attrib{position:static;background:#0b1320b3;border-radius:6px;padding:2px 7px;font-size:10.5px;opacity:.85;max-width:420px;text-align:right}
-#cams{display:flex;gap:4px;pointer-events:auto;flex-wrap:wrap;justify-content:flex-end}
-#cams button,#camHelpBtn{background:#0e1a2bcc;color:var(--stage-ink);border:1px solid #2b3d57;border-radius:7px;padding:4px 8px;font-size:12px;cursor:pointer}
-#cams button[aria-pressed=true]{background:#2a4e8acc;border-color:#4e78bd}
-#cams .gap{width:6px}
-#camHelp{position:absolute;right:0;bottom:calc(100% + 6px);width:min(330px,calc(100vw - 32px));background:#0e1a2bf2;border:1px solid #2b3d57;border-radius:9px;
-  padding:8px 11px;font-size:12px;line-height:1.5;pointer-events:auto;box-shadow:0 4px 14px #0008}
-#camHelp b{color:#fff} #camHelp p{margin:0 0 4px}
-[hidden]{display:none!important}
-#busy{position:absolute;inset:0;display:grid;place-items:center;background:#0008;color:#fff;font-size:14px;z-index:4}
-#dash{grid-area:dash;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-rows:auto 1fr;min-height:0}
-#transport{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-#transport .b{padding:5px 9px}
+#attrib{position:static;padding:2px var(--space-2);font-size:11px;max-width:420px;text-align:right;color:var(--overlay-muted)}
+#cams{display:flex;gap:var(--space-1);pointer-events:auto;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+#camHelp p{margin:0 0 var(--space-1);font-size:13px}
+#busy{z-index:4}
+/* ---- шкала часу: рядок відтворення — свої правила, доки в системі немає компонента cs-playback */
+#dash{grid-area:dash;background:var(--surface-raised);border-top:1px solid var(--line);display:grid;grid-template-rows:auto 1fr;min-height:0}
+#transport{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--line);flex-wrap:wrap}
+#transport button,#speed{height:32px;border:1px solid var(--ink-muted);border-radius:var(--radius-sm);background:var(--surface-raised);color:var(--ink);font:500 13px var(--font-sans);padding:0 var(--space-2);cursor:pointer}
+#transport button:hover{background:var(--wash)}
+#transport :focus-visible{outline:none;box-shadow:0 0 0 2px var(--focus-halo),0 0 0 4px var(--focus)}
 #play{width:42px}
-#scrub{flex:1;min-width:120px}
-#clock{font:600 13px/1 var(--mono);font-variant-numeric:tabular-nums;min-width:96px;text-align:right}
-#charts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:6px 12px 8px;min-height:0}
-.chart{display:flex;flex-direction:column;min-width:0;min-height:0}
-.chart .ttl{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
-.chart .ttl span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chart .ttl b{color:var(--ink);font-weight:600;white-space:nowrap}
-.chart canvas{flex:1;width:100%;min-height:0;cursor:crosshair}
-/* підказка до графіка: кнопка ⓘ, текст з'являється при наведенні, фокусі (клавіатура) і дотику; лежить над графіком */
-.chart{position:relative}
-.chart .ttl .nm{display:flex;align-items:center;gap:4px;min-width:0}
-.chart .ttl .nm>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tipb{flex:none;border:0;background:none;color:var(--accent);font-size:12.5px;line-height:1;padding:0 2px;cursor:help;border-radius:50%}
-.tipb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.tipt{position:absolute;left:0;right:0;bottom:calc(100% + 4px);z-index:20;background:var(--panel);color:var(--ink);border:1px solid var(--line);
-  border-radius:8px;padding:7px 9px;font-size:12px;line-height:1.4;box-shadow:0 6px 18px #0003;display:none;pointer-events:none}
-.chart:has(.tipb:hover) .tipt,.chart:has(.tipb:focus) .tipt,.tipt.on{display:block}
-.ev{display:inline-block;width:10px;height:9px;vertical-align:-1px;background:color-mix(in srgb,var(--bad) 22%,transparent);border-left:2px solid var(--bad)}
-/* ---- KPI епізоду: значення, значок стану (не лише колір смужки), підпис із ⓘ — визначення в title і в «Що означає» */
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:6px}
-.kpi{background:var(--soft);border-radius:9px;padding:7px 9px;min-width:0}
-.kpi.wide{grid-column:1/-1;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.kpi b{display:block;font:650 18px/1.15 var(--sans);font-variant-numeric:tabular-nums}
-.kpi.wide b{display:inline}
-.kpi.wide>span:not(.sr){order:-1;font-size:12.5px;font-weight:600;color:var(--ink)}
-.kpi b small{font-size:12px;font-weight:500;color:var(--muted)}
-.kpi b.sm{font-size:15px;line-height:1.35}
-.kpi span{font-size:11.5px;color:var(--muted)}
-.kpi i{font-style:normal;font-weight:700;margin-right:4px}
-.kpi.state-ok{box-shadow:inset 3px 0 0 var(--ok)} .kpi.state-bad{box-shadow:inset 3px 0 0 var(--bad)} .kpi.state-warn{box-shadow:inset 3px 0 0 var(--warn)}
-.kpi.state-ok i{color:var(--ok-ink)} .kpi.state-bad i{color:var(--bad-ink)} .kpi.state-warn i{color:var(--warn-ink)}
-.kpi .q{cursor:help;opacity:.75}
-dl.defs{margin:6px 0 0;font-size:12px;color:var(--muted)} dl.defs dt{color:var(--ink);font-weight:600;margin-top:5px} dl.defs dd{margin:0}
-.refline{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;margin-top:8px;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
-th,td{padding:3px 4px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-th{color:var(--muted);font-weight:500}
-tbody tr{cursor:pointer} tbody tr:hover td{background:var(--soft)}
-tr.cur td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.tablewrap{max-height:280px;overflow:auto;margin-top:8px;border:1px solid var(--line);border-radius:8px}
-.bar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden;margin-top:6px;position:relative}
-.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .15s}
-.bar.ind i{width:35%;position:absolute;animation:ind 1.3s ease-in-out infinite}
-@keyframes ind{0%{left:-35%}100%{left:100%}}
+#play[aria-pressed=true]{background:var(--primary-tint)}
+#scrub{flex:1;min-width:120px;accent-color:var(--primary)}
+#clock{font:500 13px/1 var(--font-mono);font-variant-numeric:tabular-nums;min-width:96px;text-align:right}
+#charts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr);gap:var(--space-3);padding:var(--space-2) var(--space-3);min-height:0;overflow:hidden}
+#charts cs-chart-frame{min-width:0;min-height:0;height:100%}
+#charts .cs-chart{height:100%;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:var(--space-1)}
+#charts .cs-chart-head{min-height:24px;gap:var(--space-2)}
+#charts .cs-chart-title{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#charts .cs-chart-tools{display:flex;align-items:center;gap:var(--space-1);flex:none}
+#charts .cs-chart-plot{aspect-ratio:auto;min-height:0}
+#charts canvas{cursor:crosshair}
+.cval{font:500 13px var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* ---- вимірювання */
+.refline{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:var(--space-2)}
+dl.defs{margin:0;font-size:13px;color:var(--ink-muted)} dl.defs dt{color:var(--ink);font-weight:500;margin-top:var(--space-2)} dl.defs dd{margin:0}
+#batchBox{margin-top:var(--space-3)}
 #batchStatus:empty{display:none}
 #batchOut.stale>*:not(.staleNote){opacity:.45}
-.staleNote{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;
-  background:color-mix(in srgb,var(--warn) 14%,transparent);border-radius:8px;padding:5px 8px;color:var(--ink)}
-.sum{display:grid;grid-template-columns:auto 1fr 1fr;gap:3px 10px;font-size:13px;margin-top:8px;font-variant-numeric:tabular-nums}
+#batchOut>*{margin-top:var(--space-3)}
+.sum{display:grid;grid-template-columns:auto 1fr 1fr;gap:3px var(--space-3);font-size:13px;font-variant-numeric:tabular-nums}
 .sum.one{grid-template-columns:auto 1fr}
-.sum b{text-align:right} .sum .h{color:var(--muted);font-size:11.5px}
-.ladtab td:first-child{font-weight:600}
+.sum b{text-align:right;font:500 13px var(--font-mono)} .sum .h{color:var(--ink-muted);font-size:12px}
+#batchOut tr.cur td{background:var(--primary-tint)}
 /* ---- проміжний макет (ноутбук, планшет): постановка зліва, полігон і вимірювання — у правій колонці */
 @media (max-width:1100px){
   #app{grid-template-columns:280px minmax(0,1fr);grid-template-rows:auto minmax(380px,62vh) auto auto;
     grid-template-areas:"head head" "side stage" "side dash" "side right";height:auto}
   html,body{height:auto}
   #side{align-self:start;position:sticky;top:0;max-height:100vh}
-  #right{border-left:0;border-top:1px solid var(--line);padding:4px 16px 16px}
+  #right{border-left:0;border-top:1px solid var(--line);padding:var(--space-1) var(--space-4) var(--space-4)}
   #dash{grid-template-rows:auto auto}
-  .chart{height:130px}
+  #charts cs-chart-frame{height:160px}
   .logos img{height:32px}
   #right section.blk{max-width:760px}
 }
 @media (max-width:760px){
   #app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto auto;grid-template-areas:"head" "stage" "dash" "side" "right"}
   #stage{height:60vh;min-height:340px}
-  #side{position:static;max-height:none;border:0;border-top:1px solid var(--line);padding:4px 16px 16px}
+  #side{position:static;max-height:none;border:0;border-top:1px solid var(--line);padding:var(--space-1) var(--space-4) var(--space-4)}
   #charts{grid-template-columns:minmax(0,1fr)}
-  .chart{height:120px}
+  #charts cs-chart-frame{height:150px}
 }
 /* ---- телефон: перемикач сцени, легенда й камери — окремим рядком під сценою, нічого не лягає одне на одне */
 @media (max-width:560px){
-  .brand .sub,.logos .tx{display:none} header{gap:8px;padding-left:10px;padding-right:10px} .logos img{height:28px}
+  .logos img{height:28px}
   #hudTR{display:none}
   #stage{height:auto;min-height:0;display:flex;flex-direction:column}
   #view{position:relative;inset:auto;height:54vh;min-height:280px}
-  #bar{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;border-top:1px solid #1f2d42}
+  #bar{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-2) var(--space-3) var(--space-3);border-top:1px solid var(--overlay-line)}
   #sceneSw{position:static;transform:none;align-self:center}
   #botRow{position:static;flex-direction:column;align-items:stretch}
   .rcol{margin-left:0;align-items:stretch}
   #cams{justify-content:flex-start}
   #attrib{max-width:none;text-align:left}
   #hudTL{max-width:calc(100% - 24px)}
-  #topC{top:74px;max-width:calc(100% - 24px)}
-  #camHelp{left:0;right:auto}
+  #topC{top:64px;max-width:calc(100% - 24px)}
 }
 @media (prefers-reduced-motion: reduce){
-  .bar i,#toast{transition:none}
-  .bar.ind i{animation:none;left:0;width:100%;opacity:.5}
   #hBusy::before{animation:none}
 }
 </style>
 <script>/*__THREE__*/</script>
 <script>/*__ORBIT__*/</script>
 </head>
-<body>
+<body data-style="lab">
 <div id="app">
-  <header>
-    <div class="logos" id="logos"></div>
-    <div class="brand">
-      <h1 title="Пульт рою · ЛР4">Пульт рою · ЛР4</h1>
-      <div class="sub" id="sub">Імітаційне навчання контролера рою</div>
-    </div>
-    <span class="mode" id="mode"></span>
-    <button class="iconbtn" id="theme" type="button" aria-label="Змінити тему" title="Світла / темна тема">◐</button>
-  </header>
+  <cs-app-header id="head" heading="Пульт рою · ЛР4" heading-level="1" subtitle="Імітаційне навчання контролера рою">
+    <span slot="brand" class="logos" id="logos"></span>
+    <cs-tag slot="actions" id="mode">Студент</cs-tag>
+    <cs-theme-toggle slot="actions"></cs-theme-toggle>
+  </cs-app-header>
 
   <aside id="side" aria-label="Постановка експерименту">
     <section class="blk">
       <h2>Сценарій</h2>
-      <div class="seg" id="setSeg" role="group" aria-label="Набір сценаріїв"></div>
+      <cs-segmented id="setSeg" label="Набір сценаріїв" hide-label full size="sm" style="margin-top:var(--space-2)"></cs-segmented>
       <div id="fixedBox">
-        <label class="f" for="scSel">Епізод</label>
-        <select id="scSel"></select>
+        <cs-select id="scSel" label="Епізод" style="margin-top:var(--space-3)"></cs-select>
       </div>
       <div id="freeBox" hidden>
         <div class="row">
-          <div><label class="f" for="fN">Дронів N</label><input id="fN" type="number" min="2" max="16" value="5"></div>
-          <div><label class="f" for="fSeed">Зерно</label><input id="fSeed" type="number" min="1" value="1"></div>
+          <cs-text-field id="fN" label="Дронів N" type="number" min="2" max="16" value="5" inputmode="numeric"></cs-text-field>
+          <cs-text-field id="fSeed" label="Зерно" type="number" min="1" value="1" inputmode="numeric"></cs-text-field>
         </div>
         <div class="row">
-          <div><label class="f" for="fWind">Вітер до, м/с</label><input id="fWind" type="number" min="0" max="12" step="0.5" value="5"></div>
-          <div><label class="f" for="fGust">Пориви до, м/с</label><input id="fGust" type="number" min="0" max="5" step="0.1" value="2"></div>
+          <cs-text-field id="fWind" label="Вітер до" unit="м/с" type="number" min="0" max="12" step="0.5" value="5" inputmode="decimal"></cs-text-field>
+          <cs-text-field id="fGust" label="Пориви до" unit="м/с" type="number" min="0" max="5" step="0.1" value="2" inputmode="decimal"></cs-text-field>
         </div>
         <p class="hint">Вільний сценарій симулятор будує за зерном: те саме зерно — той самий сценарій і без пульта. Довідкових чисел для нього немає.</p>
       </div>
@@ -287,52 +180,50 @@ tr.cur td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
     <section class="blk" id="goalBlk">
       <h2>Ціль</h2>
       <div class="row3">
-        <div><label class="f" for="gDx">Δ схід, м</label><input id="gDx" type="number" min="-1100" max="1100" step="1" value="0"></div>
-        <div><label class="f" for="gDy">Δ північ, м</label><input id="gDy" type="number" min="-1100" max="1100" step="1" value="0"></div>
-        <div><label class="f" for="gDz">Δ висота, м</label><input id="gDz" type="number" min="-70" max="70" step="1" value="0"></div>
+        <cs-text-field id="gDx" label="Δ схід" unit="м" type="number" min="-1100" max="1100" step="1" value="0" inputmode="numeric"></cs-text-field>
+        <cs-text-field id="gDy" label="Δ північ" unit="м" type="number" min="-1100" max="1100" step="1" value="0" inputmode="numeric"></cs-text-field>
+        <cs-text-field id="gDz" label="Δ висота" unit="м" type="number" min="-70" max="70" step="1" value="0" inputmode="numeric"></cs-text-field>
       </div>
-      <p class="hint" id="defInfo" style="margin-top:4px">Зсув стартової цілі від стандартної — для всіх сценаріїв.</p>
-      <div class="row" style="margin-top:8px">
-        <button class="b" id="gPick" type="button" aria-pressed="false" title="Клік на сцені — нова ціль з поточного моменту (Esc — вимкнути)">Наведення кліком</button>
-        <button class="b" id="gReset" type="button">Стандартна ціль</button>
+      <p class="hint" id="defInfo">Зсув стартової цілі від стандартної — для всіх сценаріїв.</p>
+      <div class="row">
+        <cs-button size="sm" id="gPick" pressed="false" icon="crosshair" title="Клік на сцені — нова ціль з поточного моменту (Esc — вимкнути)">Наведення кліком</cs-button>
+        <cs-button size="sm" id="gReset" icon="rotate-ccw">Стандартна ціль</cs-button>
       </div>
-      <label class="f" for="gAlt">Висота поточної цілі: <b id="gAltV">—</b> м</label>
-      <input id="gAlt" type="range" min="3" max="70" step="1" value="20" aria-describedby="gAltHint">
-      <p class="hint" id="gAltHint" style="margin-top:2px">Діє з поточного моменту польоту. <b>R</b> / <b>F</b> — вище / нижче на 5 м.</p>
-      <div class="refline" style="margin-top:6px"><span>Поточна ціль</span><b id="goalNow" style="font-variant-numeric:tabular-nums">—</b></div>
-      <p class="hint" id="goalNowHint" style="margin-top:2px"></p>
-      <div class="row" style="margin-top:6px;align-items:center">
+      <cs-slider id="gAlt" label="Висота поточної цілі" min="3" max="70" step="1" value="20" unit="м"></cs-slider>
+      <p class="hint" id="gAltHint">Діє з поточного моменту польоту. <cs-kbd>R</cs-kbd> / <cs-kbd>F</cs-kbd> — вище / нижче на 5 м.</p>
+      <div class="refline"><span>Поточна ціль</span><b id="goalNow" style="font:500 13px var(--font-mono)">—</b></div>
+      <p class="hint" id="goalNowHint"></p>
+      <div class="row" style="align-items:center">
         <span class="hint" id="planInfo" style="margin:0">Змін цілі в польоті: 0</span>
-        <button class="b" id="planClear" type="button" disabled>Скасувати зміни цілі</button>
+        <cs-button size="sm" id="planClear" disabled>Скасувати зміни цілі</cs-button>
       </div>
-      <label class="chk" style="display:block;margin-top:8px"><input type="checkbox" id="untilArr" checked> продовжити після 30 с, доки рій не долетить</label>
-      <details class="more">
-        <summary>Як змінювати ціль</summary>
-        <p><b>Подвійний клік</b> по землі чи будівлі (або «Наведення кліком» і звичайний клік; Esc — вимкнути) — нова ціль з поточного моменту: рій розвертається, змінювати ціль можна скільки завгодно разів. Ці зміни діють лише на поточний епізод.</p>
-        <p>Поля Δ зсувають стартову ціль усіх сценаріїв від стандартної (карта лишається на місці); зсув запам'ятовується в браузері, поки ви не повернете стандартну ціль.</p>
-        <p>Рій летить ≈ 7 м/с; ціль — не далі 1 км від старту (≈ 2,5 хв польоту), зона польоту розширюється до неї.</p>
-      </details>
+      <cs-checkbox id="untilArr" checked label="Продовжити після 30 с, доки рій не долетить"></cs-checkbox>
+      <cs-disclosure heading="Як змінювати ціль">
+        <p class="hint"><b>Подвійний клік</b> по землі чи будівлі (або «Наведення кліком» і звичайний клік; <cs-kbd>Esc</cs-kbd> — вимкнути) — нова ціль з поточного моменту: рій розвертається, змінювати ціль можна скільки завгодно разів. Ці зміни діють лише на поточний епізод.</p>
+        <p class="hint">Поля Δ зсувають стартову ціль усіх сценаріїв від стандартної (карта лишається на місці); зсув запамʼятовується в браузері, поки ви не повернете стандартну ціль.</p>
+        <p class="hint">Рій летить ≈ 7 м/с; ціль — не далі 1 км від старту (≈ 2,5 хв польоту), зона польоту розширюється до неї.</p>
+      </cs-disclosure>
     </section>
 
     <section class="blk">
       <h2>Модель</h2>
-      <select id="ctrlSel" aria-label="Модель"></select>
+      <cs-select id="ctrlSel" label="Модель" hide-label></cs-select>
       <p class="hint" id="ctrlInfo"></p>
     </section>
 
     <section class="blk">
-      <h2>Діагностична драбина <span class="pill nn" id="kPill"></span></h2>
-      <input id="kRange" type="range" min="0" max="5" step="1" value="5" aria-label="Скількома дронами керує модель">
+      <h2>Діагностична драбина <cs-tag id="kPill" tone="brand" hidden></cs-tag></h2>
+      <cs-slider id="kRange" label="Дронів веде модель" min="0" max="5" step="1" value="5"></cs-slider>
       <div class="ladder-v" id="kText"></div>
       <p class="hint">Перші k дронів (за номером) веде обрана модель, решту — Рейнольдс. Якщо з 1 дроном моделі рій літає, а з усіма — ні, модель вивчила саму функцію, але потрапляє в стани, яких не було в даних (зсув розподілу станів).</p>
     </section>
 
     <section class="blk" id="mineBlk">
       <h2>Своя модель</h2>
-      <div id="drop">Перетягніть сюди <b>*.onnx</b><br>або
-        <button class="b" id="loadBtn" type="button">Обрати файл…</button>
+      <div id="drop">Перетягніть сюди <b>*.onnx</b> або<br>
+        <cs-button size="sm" id="loadBtn" icon="upload">Обрати файл…</cs-button>
         <input id="fileIn" type="file" accept=".onnx" hidden></div>
-      <div id="mineErr" role="alert"></div>
+      <div id="mineErr"></div>
       <p class="hint">Будь-яка модель у форматі симулятора: файл ONNX, у метаданих якого записано спостереження (A, B або C) і систему координат дії — так зберігає <code>export_onnx</code> з <code>train.py</code>. Поліном, ліс, нейромережа. Перевірити файл: <code>swarm-sim check model.onnx</code>.</p>
       <div class="mine" id="mine"></div>
     </section>
@@ -340,102 +231,118 @@ tr.cur td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
     <section class="blk">
       <h2>Шари</h2>
       <div class="chk">
-        <label><input type="checkbox" id="lyTrails" checked> сліди</label>
-        <label><input type="checkbox" id="lyLinks" checked> зв'язки ≤ 15 м</label>
-        <label><input type="checkbox" id="lyRings" checked> небезпека &lt; 1,2 м</label>
-        <label><input type="checkbox" id="lyLabels"> номери</label>
-        <label title="Кружок — Рейнольдс, ромб — модель, хрестик — вибув. Сталого розміру на екрані: видно здалеку, але зблизька можуть закривати сам дрон"><input type="checkbox" id="lyMarkers" checked> маркери дронів (● ◆ ✕)</label>
+        <cs-checkbox id="lyTrails" checked label="Сліди"></cs-checkbox>
+        <cs-checkbox id="lyLinks" checked label="Звʼязки ≤ 15 м"></cs-checkbox>
+        <cs-checkbox id="lyRings" checked label="Небезпека < 1,2 м"></cs-checkbox>
+        <cs-checkbox id="lyLabels" label="Номери"></cs-checkbox>
+        <cs-checkbox id="lyMarkers" checked label="Маркери дронів (● ◆ ✕)" description="Кружок — Рейнольдс, ромб — модель, хрестик — вибув. Сталого розміру на екрані: видно здалеку, але зблизька можуть закривати сам дрон."></cs-checkbox>
       </div>
-      <label class="f" for="fxSel">Фінал: коли місію виконано (без подій, весь рій біля цілі)</label>
-      <select id="fxSel">
+      <cs-select id="fxSel" label="Фінал: коли місію виконано (без подій, весь рій біля цілі)">
         <option value="fire">феєрверк</option>
         <option value="boom">вибух</option>
         <option value="off">без ефекту</option>
-      </select>
-      <div class="chk"><label><input type="checkbox" id="fxDrone" checked> спалах, коли дрон долетів до цілі</label>
-        <label><input type="checkbox" id="fxCrash" checked> вибух дрона при зіткненні</label></div>
-      <label class="f" for="mapProv">Карта в режимі «Кремль»</label>
-      <select id="mapProv"></select>
+      </cs-select>
+      <div class="chk" style="margin-top:var(--space-3)">
+        <cs-checkbox id="fxDrone" checked label="Спалах, коли дрон долетів до цілі"></cs-checkbox>
+        <cs-checkbox id="fxCrash" checked label="Вибух дрона при зіткненні"></cs-checkbox>
+      </div>
+      <cs-select id="mapProv" label="Карта в режимі «Кремль»"></cs-select>
       <p class="hint" id="mapNote"></p>
-      <label class="f" for="scaleR">Розмір дронів: <span id="scaleV">×2</span></label>
-      <input id="scaleR" type="range" min="1" max="6" step="0.5" value="2" aria-describedby="scaleHint">
-      <p class="hint" id="scaleHint" style="margin-top:2px">Лише для видимості: відстані й зіткнення рахуються для справжнього розміру (0,6 м). Маркери ● / ◆ показують дронів з будь-якої відстані.</p>
+      <cs-slider id="scaleR" label="Розмір дронів" min="1" max="6" step="0.5" value="2" description="Лише для видимості: відстані й зіткнення рахуються для справжнього розміру (0,6 м). Маркери ● / ◆ показують дронів з будь-якої відстані."></cs-slider>
     </section>
   </aside>
 
-  <main id="stage" aria-label="Полігон">
+  <main id="stage" class="cs-stage" data-theme="dark" aria-label="Полігон">
     <div id="view">
       <canvas id="gl" tabindex="0" aria-label="3D-сцена польоту рою" aria-describedby="keysHelp"></canvas>
-      <div class="hud" id="hudTL"><div class="t" id="hT">0,0 <small>с</small></div><div class="s" id="hS"></div><div class="s" id="hBusy" hidden>перераховую епізод…</div></div>
+      <div class="hud cs-overlay" id="hudTL"><div class="t" id="hT">0,0 <small>с</small></div><div class="s" id="hS"></div><div class="s" id="hBusy" hidden>перераховую епізод…</div></div>
       <div class="hud" id="hudTR"><canvas id="compass" width="112" height="132" role="img" aria-label="Компас: вітер і напрямок на ціль"></canvas></div>
       <div id="topC">
-        <div id="goalBanner" hidden><span id="goalBannerTx">Ціль зсунута</span><button type="button" id="goalBannerBtn">Повернути стандартну</button></div>
-        <div id="toast" role="status" aria-live="polite" aria-atomic="true"><span id="toastTx"></span><button type="button" id="toastX" aria-label="Закрити повідомлення">×</button></div>
+        <cs-banner id="goalBanner" tone="warning" hidden><span id="goalBannerTx">Ціль зсунута</span><cs-button slot="action" size="sm" id="goalBannerBtn">Повернути стандартну</cs-button></cs-banner>
       </div>
-      <div id="busy" hidden>Рахую епізод…</div>
+      <cs-spinner id="busy" overlay size="lg" label="Рахую епізод…" hidden></cs-spinner>
     </div>
     <div id="bar">
-      <div id="sceneSw" role="group" aria-label="Сцена">
-        <button type="button" data-scene="space" aria-pressed="true">3D-простір</button>
-        <button type="button" data-scene="kremlin" aria-pressed="false">Кремль</button>
-      </div>
+      <cs-segmented id="sceneSw" label="Сцена" hide-label size="sm" value="space">
+        <option value="space">3D-простір</option>
+        <option value="kremlin">Кремль</option>
+      </cs-segmented>
       <div id="botRow">
-        <div class="hud" id="hudBL" aria-label="Легенда сцени"><span><svg width="11" height="11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.6" fill="var(--st-expert)" stroke="#0b1320" stroke-width="1.2"/></svg>Рейнольдс</span><span><svg width="12" height="12" aria-hidden="true"><path d="M6 .8 11.2 6 6 11.2.8 6z" fill="var(--st-nn)" stroke="#0b1320" stroke-width="1.2"/></svg>модель</span><span><svg width="11" height="11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4" fill="none" stroke="var(--st-goal)" stroke-width="2"/></svg><b id="lgGoal" style="font-weight:inherit">ціль (5 м)</b></span><span><svg width="11" height="11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4" fill="none" stroke="var(--st-bad)" stroke-width="2"/></svg>&lt; 1,2 м / зіткнення</span><span><svg width="11" height="11" aria-hidden="true"><path d="M2 2l7 7M9 2l-7 7" stroke="var(--st-dead)" stroke-width="2"/></svg>вибув</span></div>
+        <cs-legend floating id="hudBL" heading="Легенда сцени">
+          <cs-series id="lgExpert" label="Рейнольдс (●)" marker="dot" color="2"></cs-series>
+          <cs-series id="lgNn" label="модель (◆)" marker="square" color="1"></cs-series>
+          <cs-series id="lgGoal" label="ціль (5 м)" marker="dot" color="4"></cs-series>
+          <cs-series id="lgBad" label="< 1,2 м / зіткнення" marker="dot" color="var(--danger)"></cs-series>
+          <cs-series id="lgDead" label="вибув (✕)" marker="dot" color="var(--overlay-muted)"></cs-series>
+        </cs-legend>
         <div class="rcol">
-          <div class="hud" id="attrib"></div>
-          <div id="camHelp" hidden role="note" aria-label="Керування камерою й клавіші">
-            <p><b>Миша:</b> ліва кнопка — обертати, права або Shift + ліва — зсувати, колесо — наближати.</p>
-            <p><b>W A S D</b> — рух камери, <b>Q / E</b> — вниз / вгору.</p>
-            <p><b>Пробіл</b> — відтворення / пауза, <b>← / →</b> — крок (Shift — 20 кроків), <b>R / F</b> — ціль вище / нижче, <b>Esc</b> — вимкнути наведення.</p>
-            <p style="margin:0">Клавіші працюють, коли фокус на сцені (клік по ній), а не на кнопці чи полі.</p>
-          </div>
+          <div class="hud cs-overlay" id="attrib"></div>
           <div id="cams" role="group" aria-label="Камера">
-            <button type="button" data-cam="orbit" aria-pressed="false">Огляд</button>
-            <button type="button" data-cam="follow" aria-pressed="true">За роєм</button>
-            <button type="button" data-cam="top" aria-pressed="false">Згори</button>
-            <button type="button" data-cam="side" aria-pressed="false">Збоку</button>
-            <span class="gap" aria-hidden="true"></span>
-            <button type="button" data-cam="goal" title="Перенести камеру до поточної цілі">→ до цілі</button>
-            <button type="button" id="camHelpBtn" aria-expanded="false" aria-controls="camHelp" title="Керування камерою й клавіші">?</button>
+            <cs-segmented id="camSeg" label="Камера" hide-label size="sm" value="follow">
+              <option value="orbit">Огляд</option>
+              <option value="follow">За роєм</option>
+              <option value="top">Згори</option>
+              <option value="side">Збоку</option>
+            </cs-segmented>
+            <cs-button size="sm" id="camGoal" icon="locate-fixed" title="Перенести камеру до поточної цілі">До цілі</cs-button>
+            <cs-popover id="camHelp" heading="Керування камерою й клавіші" label="Керування камерою й клавіші" icon="keyboard">
+              <p><b>Миша:</b> ліва кнопка — обертати, права або <cs-kbd>Shift</cs-kbd> + ліва — зсувати, колесо — наближати.</p>
+              <p><cs-kbd>W</cs-kbd> <cs-kbd>A</cs-kbd> <cs-kbd>S</cs-kbd> <cs-kbd>D</cs-kbd> — рух камери, <cs-kbd>Q</cs-kbd> / <cs-kbd>E</cs-kbd> — вниз / вгору.</p>
+              <p><cs-kbd>Пробіл</cs-kbd> — відтворення / пауза, <cs-kbd>←</cs-kbd> / <cs-kbd>→</cs-kbd> — крок (<cs-kbd>Shift</cs-kbd> — 20 кроків), <cs-kbd>R</cs-kbd> / <cs-kbd>F</cs-kbd> — ціль вище / нижче, <cs-kbd>Esc</cs-kbd> — вимкнути наведення.</p>
+              <p style="margin:0">Клавіші працюють, коли фокус на сцені (клік по ній), а не на кнопці чи полі.</p>
+            </cs-popover>
           </div>
         </div>
       </div>
     </div>
-    <p class="sr" id="keysHelp">Клавіші: Пробіл — відтворення або пауза, стрілки вліво і вправо — крок, R і F — висота цілі, W A S D Q E — рух камери.</p>
+    <p class="cs-sr-only" id="keysHelp">Клавіші: Пробіл — відтворення або пауза, стрілки вліво і вправо — крок, R і F — висота цілі, W A S D Q E — рух камери.</p>
   </main>
 
   <section id="dash" aria-label="Шкала часу">
     <div id="transport">
-      <button class="b" id="play" type="button" aria-label="Відтворити" aria-pressed="false">▶</button>
-      <button class="b" id="back" type="button" aria-label="Крок назад, 0,05 с" title="Крок назад (←; Shift — 20 кроків)">−1 крок</button>
-      <button class="b" id="fwd" type="button" aria-label="Крок уперед, 0,05 с" title="Крок уперед (→; Shift — 20 кроків)">+1 крок</button>
+      <button id="play" type="button" aria-label="Відтворити" aria-pressed="false">▶</button>
+      <button id="back" type="button" aria-label="Крок назад, 0,05 с" title="Крок назад (←; Shift — 20 кроків)">−1 крок</button>
+      <button id="fwd" type="button" aria-label="Крок уперед, 0,05 с" title="Крок уперед (→; Shift — 20 кроків)">+1 крок</button>
       <input id="scrub" type="range" min="0" max="600" step="1" value="0" aria-label="Час епізоду">
       <span id="clock">0,00 / 30 с</span>
-      <select id="speed" aria-label="Швидкість відтворення" style="width:auto">
+      <select id="speed" aria-label="Швидкість відтворення">
         <option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1" selected>1×</option>
         <option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select>
     </div>
     <div id="charts">
-      <div class="chart"><div class="ttl"><span class="nm"><span>Мін. відстань між дронами, м</span><button type="button" class="tipb" aria-label="Що показує графік «Мін. відстань між дронами, м»" aria-describedby="tipMs">ⓘ</button></span><b id="cMs"></b></div><div class="tipt" id="tipMs" role="tooltip">Найменша відстань між двома живими дронами в кожен момент польоту, м. Показує, наскільки рій близький до зіткнення. Червоний пунктир — поріг зіткнення 0,9 м (обидва дрони вибувають), жовті крапки — зона небезпеки 1,2 м. Рейнольдс зазвичай тримає 1,5–2 м і більше; модель, що «стискає» рій, опускає криву до порогу. Заштрихована ділянка — час після першої події.</div><canvas id="chMs" role="img" aria-label="Графік мінімальної відстані"></canvas></div>
-      <div class="chart"><div class="ttl"><span class="nm"><span>Online MSE (у σ), лог. шкала</span><button type="button" class="tipb" aria-label="Що показує графік «Online MSE (у σ), лог. шкала»" aria-describedby="tipMse">ⓘ</button></span><b id="cMse"></b></div><div class="tipt" id="tipMse" role="tooltip">Наскільки команда моделі відрізняється від дії Рейнольдса-вчителя в тих самих станах, які відвідала сама модель, — у нормованих одиницях (σ дій датасету), як val MSE. Якщо крива з часом росте на порядки — рій потрапив у стани, яких немає в даних експерта (covariate shift); саме це лікує DAgger. Шкала логарифмічна; для самого Рейнольдса не рахується. Заштрихована ділянка — після першої події.</div><canvas id="chMse" role="img" aria-label="Графік online MSE"></canvas></div>
-      <div class="chart"><div class="ttl"><span class="nm"><span>Узгодженість φ (0…1)</span><button type="button" class="tipb" aria-label="Що показує графік «Узгодженість φ (0…1)»" aria-describedby="tipPhi">ⓘ</button></span><b id="cPhi"></b></div><div class="tipt" id="tipPhi" role="tooltip">Параметр порядку φ = ‖Σ v̂ᵢ‖ / n — наскільки однаково спрямовані швидкості дронів: 1 — усі летять паралельно, 0 — хаотично. Під час перельоту до цілі φ близький до 1; над ціллю природно падає (дрони кружляють). Різкі провали посеред польоту — рій розсипається або уникає зіткнення. Заштрихована ділянка — після першої події.</div><canvas id="chPhi" role="img" aria-label="Графік узгодженості"></canvas></div>
+      <cs-chart-frame id="frMs" heading="Мін. відстань між дронами, м" summary="Графік мінімальної відстані між дронами">
+        <b slot="toolbar" class="cval" id="cMs"></b>
+        <cs-info slot="toolbar" id="tipMs" label="Що показує графік «Мін. відстань між дронами, м»">Найменша відстань між двома живими дронами в кожен момент польоту, м. Показує, наскільки рій близький до зіткнення. Пунктир — поріг зіткнення 0,9 м (обидва дрони вибувають), крапки — зона небезпеки 1,2 м. Рейнольдс зазвичай тримає 1,5–2 м і більше; модель, що «стискає» рій, опускає криву до порогу. Заштрихована ділянка — час після першої події.</cs-info>
+        <canvas id="chMs" aria-hidden="true"></canvas>
+      </cs-chart-frame>
+      <cs-chart-frame id="frMse" heading="Online MSE (у σ), лог. шкала" summary="Графік online MSE">
+        <b slot="toolbar" class="cval" id="cMse"></b>
+        <cs-info slot="toolbar" id="tipMse" label="Що показує графік «Online MSE (у σ), лог. шкала»">Наскільки команда моделі відрізняється від дії Рейнольдса-вчителя в тих самих станах, які відвідала сама модель, — у нормованих одиницях (σ дій датасету), як val MSE. Якщо крива з часом росте на порядки — рій потрапив у стани, яких немає в даних експерта (covariate shift); саме це лікує DAgger. Шкала логарифмічна; для самого Рейнольдса не рахується. Заштрихована ділянка — після першої події.</cs-info>
+        <canvas id="chMse" aria-hidden="true"></canvas>
+      </cs-chart-frame>
+      <cs-chart-frame id="frPhi" heading="Узгодженість φ (0…1)" summary="Графік узгодженості">
+        <b slot="toolbar" class="cval" id="cPhi"></b>
+        <cs-info slot="toolbar" id="tipPhi" label="Що показує графік «Узгодженість φ (0…1)»">Параметр порядку φ = ‖Σ v̂ᵢ‖ / n — наскільки однаково спрямовані швидкості дронів: 1 — усі летять паралельно, 0 — хаотично. Під час перельоту до цілі φ близький до 1; над ціллю природно падає (дрони кружляють). Різкі провали посеред польоту — рій розсипається або уникає зіткнення. Заштрихована ділянка — після першої події.</cs-info>
+        <canvas id="chPhi" aria-hidden="true"></canvas>
+      </cs-chart-frame>
     </div>
   </section>
 
   <aside id="right" aria-label="Вимірювання">
     <section class="blk">
-      <h2>Епізод <span class="pill" id="epPill"></span></h2>
-      <div class="kpis" id="kpis"></div>
+      <h2>Епізод <cs-tag id="epPill" hidden></cs-tag></h2>
+      <cs-key-value id="kpiState" label="Стан епізоду"></cs-key-value>
+      <cs-stat-group id="kpiStats" label="Показники епізоду" columns="2"></cs-stat-group>
       <div class="refline" id="refLine"></div>
-      <details class="more" id="kpiDefs"><summary>Що означають показники</summary><dl class="defs" id="defsList"></dl></details>
+      <cs-disclosure id="kpiDefs" heading="Що означають показники"><dl class="defs" id="defsList"></dl></cs-disclosure>
     </section>
     <section class="blk">
       <h2>Пакетний прогін</h2>
       <div class="row">
-        <button class="b primary" id="batchBtn" type="button">Усі сценарії набору</button>
-        <button class="b" id="ladderBtn" type="button">Драбина: 1, 2, усі дрони — модель</button>
+        <cs-button size="sm" variant="primary" id="batchBtn">Усі сценарії набору</cs-button>
+        <cs-button size="sm" id="ladderBtn">Драбина: 1, 2, усі дрони — модель</cs-button>
       </div>
-      <div class="bar" id="barBox" aria-hidden="true"><i id="bar"></i></div>
+      <div id="batchBox"><cs-progress variant="line" id="barBox" label="Пакетний прогін" hide-label value="0"></cs-progress></div>
       <p class="hint" id="batchStatus" role="status" aria-live="polite"></p>
       <div id="batchOut"></div>
     </section>
@@ -449,7 +356,20 @@ tr.cur td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
 
 <script>const D = /*__DATA__*/null;</script>
 <script>
+// Компоненти Core System будуються після розбору сторінки, тож вміст, який вони забирають під час побудови
+// (кнопки набору сценаріїв, назва місця на перемикачі сцени), додається одразу, а решта коду — у CoreSystem.ready.
 (function () {
+  const keys = Object.keys(D.sets).concat(D.static ? [] : ["free"]), seg = document.getElementById("setSeg");
+  for (const k of keys) {
+    const o = document.createElement("option");
+    o.value = k; o.textContent = k === "free" ? "Вільний" : String(D.sets[k].label).replace(/\s*\(\d+\)\s*$/, "");
+    seg.appendChild(o);
+  }
+  seg.setAttribute("value", keys[0]);
+  const M = D.maps || { places: [] }, place = M.places.find(p => p.id === M.default_place) || M.places[0];
+  if (place) document.querySelector('#sceneSw option[value="kremlin"]').textContent = place.label.replace(/^Московський /, "");
+})();
+CoreSystem.ready(function () {
 "use strict";
 const $ = id => document.getElementById(id);
 const fmt = (x, d = 2) => (x === null || x === undefined || Number.isNaN(x) ? "—" : !Number.isFinite(x) ? "∞" : x.toFixed(d).replace(".", ","));
@@ -458,6 +378,11 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 // екранування для innerHTML: назви моделей — дані користувача (інакше <img onerror=…> у назві виконувався
 // при кожному відкритті сторінки, бо модель зберігається в localStorage)
 const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+// компоненти Core System: disabled — атрибут (у cs-button, cs-select, cs-slider немає однойменної властивості)
+const dis = (el, on) => el.toggleAttribute("disabled", !!on);
+// кольори полігона: він завжди темний (data-theme="dark" на #stage), тож токени читаються з нього в обох темах
+const stg = n => CoreSystem.readToken(n, $("stage"));
+const series = n => CoreSystem.seriesValue(n, $("stage"));
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } } };
 
@@ -468,7 +393,6 @@ const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { ret
 const P = D.P;                  // dt, duration, goal_radius, crash_dist, zone_radius, r_neighbor, k_max
 const STATIC = D.static || null;
 const SETS = D.sets;            // {eval:{label, scenarios:[{n_agents, wind, gust_std, seed, goal}]}, hidden?:{…}}
-const setKeys = Object.keys(SETS).concat(STATIC ? [] : ["free"]);
 // POST до симулятора; D.token — випадковий рядок сесії від сервера (без нього сервер відповідає 403: інша вкладка
 // чи сторінка не може керувати пультом). Самодостатня сторінка запису токена не має і POST не робить.
 async function api(path, body, raw) {
@@ -500,29 +424,20 @@ const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-mo
 // ---------------------------------------------------------------- шапка
 $("logos").innerHTML = (D.logos || []).map(l => `<img src="${l.src}" alt="${l.alt}" title="${l.alt}">`).join("");
 const V = D.variant || {};
-$("sub").textContent = (V.variant_id ? `Варіант ${String(V.variant_id).padStart(2, "0")}` + (V.n_lo ? ` · N ${V.n_lo}–${V.n_hi}, вітер до ${fmt(V.wind_max, 1)} м/с` : "") : (D.title || "Перегляд запису")) + " · ОК32 «Машинне навчання», кафедра СШІ";
-$("mode").textContent = D.mode === "teacher" ? "Викладач" : D.mode === "record" ? "Запис" : "Студент";
-$("mode").classList.toggle("teacher", D.mode === "teacher");
-(function themeInit() {
-  const saved = store.get("lab4-theme");
-  if (saved) document.documentElement.dataset.theme = saved;
-  $("theme").onclick = () => {
-    const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.theme = dark ? "light" : "dark";
-    store.set("lab4-theme", document.documentElement.dataset.theme);
-    chartGen++; drawCharts();
-  };
-})();
+$("head").setAttribute("subtitle", (V.variant_id ? `Варіант ${String(V.variant_id).padStart(2, "0")}` + (V.n_lo ? ` · N ${V.n_lo}–${V.n_hi}, вітер до ${fmt(V.wind_max, 1)} м/с` : "") : (D.title || "Перегляд запису")) + " · ОК32 «Машинне навчання», кафедра СШІ");
+$("mode").text = D.mode === "teacher" ? "Викладач" : D.mode === "record" ? "Запис" : "Студент";
+if (D.mode === "teacher") $("mode").setAttribute("tone", "brand");
+// тему перемикає cs-theme-toggle (запамʼятовує вибір); графіки малюються на canvas — перемалювати в новій темі
+CoreSystem.onThemeChange(() => { chartGen++; drawCharts(); });
 
 // ---------------------------------------------------------------- керування: сценарій
-$("setSeg").innerHTML = setKeys.map(k => `<button type="button" data-set="${k}" aria-pressed="${k === st.set}" title="${k === "free" ? "Свій сценарій за зерном" : esc(SETS[k].scenarios.length + " сценаріїв")}">${esc(setLabel(k))}</button>`).join("");
-$("setSeg").onclick = e => { const b = e.target.closest("button"); if (!b) return; st.set = b.dataset.set; st.idx = 0; st.goalPlan = []; useDefaultGoal(); syncSet(); recompute(); };
+$("setSeg").onchange = () => { st.set = $("setSeg").value; st.idx = 0; st.goalPlan = []; useDefaultGoal(); syncSet(); recompute(); };
 function syncSet() {
-  for (const b of $("setSeg").children) b.setAttribute("aria-pressed", b.dataset.set === st.set);
+  $("setSeg").value = st.set;
   const free = st.set === "free";
   $("fixedBox").hidden = free; $("freeBox").hidden = !free;
   if (!free) {
-    $("scSel").innerHTML = SETS[st.set].scenarios.map((s, i) => `<option value="${i}">#${i + 1} · N = ${s.n_agents}, вітер ${fmt(Math.hypot(s.wind[0], s.wind[1]), 1)} м/с</option>`).join("");
+    $("scSel").select.innerHTML = SETS[st.set].scenarios.map((s, i) => `<option value="${i}">#${i + 1} · N = ${s.n_agents}, вітер ${fmt(Math.hypot(s.wind[0], s.wind[1]), 1)} м/с</option>`).join("");
     $("scSel").value = st.idx;
   }
   markStale();
@@ -531,7 +446,7 @@ $("scSel").onchange = () => { st.idx = +$("scSel").value; st.goalPlan = []; useD
 // модель зі спостереженням A бачить не більше P.n_max_a дронів (10 слотів), решта — до 16
 function nMax() { const c = ctrls.get(st.ctrl); return c && c.observation === "A" ? (P.n_max_a || 10) : 16; }
 function syncNMax() {
-  const m = nMax(), f = $("fN"); f.max = m;
+  const m = nMax(), f = $("fN"); f.setAttribute("max", m);
   if (+f.value > m) { f.value = m; if (st.free) st.free.n = m; }
 }
 for (const id of ["fN", "fSeed", "fWind", "fGust"]) $(id).onchange = () => {
@@ -553,7 +468,7 @@ function clampGoal(g) {
 function syncPlan() {
   const n = st.goalPlan.length;
   $("planInfo").textContent = `Змін цілі в польоті: ${n}`;
-  $("planClear").disabled = !n;
+  dis($("planClear"), !n);
   syncGoalBanner();
 }
 function syncGoalBanner() {
@@ -565,7 +480,7 @@ function syncGoalBanner() {
   $("defInfo").textContent = shifted
     ? "Зсув діє на всі сценарії й запам'ятовується в браузері, доки ви не повернете стандартну ціль."
     : "Зсув стартової цілі від стандартної — для всіх сценаріїв.";
-  $("gReset").disabled = !shifted && !n;
+  dis($("gReset"), !shifted && !n);
 }
 $("planClear").onclick = () => { st.goalPlan = []; syncPlan(); recompute({ keepCam: true }); };
 $("untilArr").checked = st.untilArrive;
@@ -593,10 +508,9 @@ $("gReset").onclick = resetGoal; $("goalBannerBtn").onclick = resetGoal;
 try { const g = JSON.parse(store.get("lab4-goald") || "null"); setGoalD(Array.isArray(g) && g.length === 3 ? g : [0, 0, 0], false); } catch (e) { setGoalD([0, 0, 0], false); }
 // висота цілі: повзунок показує висоту поточної цілі кадру; зміна — нова ціль з тим самим місцем, іншою висотою
 function syncAlt(z) {
-  if (document.activeElement === $("gAlt")) return;
-  $("gAlt").value = Math.round(z); $("gAltV").textContent = Math.round(z);
+  if (document.activeElement === $("gAlt").input) return;
+  $("gAlt").value = Math.round(z);
 }
-$("gAlt").oninput = () => ($("gAltV").textContent = $("gAlt").value);
 $("gAlt").onchange = () => {
   if (!st.ep) return;
   const g = goalAt(st.f), z = +$("gAlt").value;
@@ -607,21 +521,21 @@ $("gAlt").onchange = () => {
 function fillCtrls() {
   const groups = {};
   for (const [id, c] of ctrls) (groups[c.group || "Мої моделі"] ||= []).push([id, c]);
-  $("ctrlSel").innerHTML = Object.entries(groups).map(([g, list]) => `<optgroup label="${esc(groupName(g))}">` +
+  $("ctrlSel").select.innerHTML = Object.entries(groups).map(([g, list]) => `<optgroup label="${esc(groupName(g))}">` +
     list.map(([id, c]) => `<option value="${esc(id)}">${esc(c.label)}</option>`).join("") + "</optgroup>").join("");
   $("ctrlSel").value = st.ctrl;
-  $("ctrlSel").disabled = !!STATIC;
+  dis($("ctrlSel"), STATIC);
 }
 $("ctrlSel").onchange = () => { st.ctrl = $("ctrlSel").value; syncNMax(); syncK(); markStale(); recompute(); };
 const isRey = c => c.kind === "reynolds";
 function syncK() {
   const n = scenario().sc.n_agents, c = ctrls.get(st.ctrl), fixed = isRey(c) || !!STATIC;
-  $("kRange").max = n; $("kRange").disabled = fixed;
+  $("kRange").setAttribute("max", n); dis($("kRange"), fixed);
   const k = st.k === null ? n : Math.min(st.k, n);
   $("kRange").value = isRey(c) ? n : k;
   $("kText").innerHTML = isRey(c) ? `усі ${n} — Рейнольдс` : (k >= n ? `усі ${n} — модель` : `${k} модель <small>+ ${n - k} Рейнольдс</small>`);
-  $("kRange").setAttribute("aria-valuetext", isRey(c) ? `усі ${n} дронів — Рейнольдс` : `${k} з ${n} дронів — модель`);
-  $("kPill").textContent = isRey(c) ? "" : `k = ${k} з ${n}`;
+  $("kRange").formatValue = v => (isRey(c) ? `усі ${n} — Рейнольдс` : `${v} з ${n}`);
+  $("kPill").hidden = isRey(c); $("kPill").text = `k = ${k} з ${n}`;
   const info = isRey(c) ? "Контролер Рейнольдса (reynolds.onnx) — вчитель: його дії — мітки даних, а політ — верхня межа для моделей." :
     `Спостереження ${c.observation}; дія — ${c.frame === "body" ? "у системі координат дрона (body frame)" : "у світовій системі координат"}${c.note ? " · " + c.note : ""}`;
   $("ctrlInfo").textContent = info;
@@ -633,13 +547,12 @@ $("kRange").onchange = () => { markStale(); recompute(); };
 const toB64 = buf => { let s = ""; const b = new Uint8Array(buf); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
 // помилка моделі — зрозумілим реченням під полем завантаження; сирий текст симулятора / ONNX Runtime — у «деталях»
 function mineError(name, msg) {
-  if (!name) { $("mineErr").innerHTML = ""; $("mineErr").className = ""; return; }
+  if (!name) { $("mineErr").innerHTML = ""; return; }
   const meta = /lab4\.|метадан|observation|frame/i.test(msg);
-  $("mineErr").className = "err";
-  $("mineErr").innerHTML = `<b>«${esc(name)}» не прийнято.</b> ` + (meta
+  $("mineErr").innerHTML = `<cs-banner tone="danger" heading="«${esc(name)}» не прийнято" live style="margin-top:var(--space-2)">` + (meta
     ? "У файлі немає потрібних метаданих моделі (спостереження A/B/C і система координат). Збережіть модель через <code>export_onnx</code> з <code>train.py</code>."
     : "Файл не є моделлю ONNX у форматі симулятора або пошкоджений.") +
-    ` Перевірте: <code>swarm-sim check model.onnx</code>.<details><summary>Технічні деталі</summary><pre>${esc(String(msg).replace(/\S*swarm-view-\S*?\.onnx/g, "<файл>"))}</pre></details>`;
+    ` Перевірте: <code>swarm-sim check model.onnx</code>.<cs-disclosure heading="Технічні деталі"><pre>${esc(String(msg).replace(/\S*swarm-view-\S*?\.onnx/g, "<файл>"))}</pre></cs-disclosure></cs-banner>`;
 }
 async function addMine(name, buf, persist) {
   let c;
@@ -657,7 +570,7 @@ async function addMine(name, buf, persist) {
 }
 function renderMine() {
   const mine = [...ctrls.entries()].filter(([, c]) => c.kind === "student");
-  $("mine").innerHTML = mine.map(([id, c]) => `<div><b title="${esc(c.label)}">${esc(c.label)}</b><span class="pill ok">${esc(c.observation)} · ${esc(c.frame)}</span></div>`).join("");
+  $("mine").innerHTML = mine.map(([id, c]) => `<div><b title="${esc(c.label)}">${esc(c.label)}</b><cs-tag>${esc(c.observation)} · ${esc(c.frame)}</cs-tag></div>`).join("");
 }
 function readFile(file) {
   if (!/\.onnx$/i.test(file.name)) { mineError(file.name, "розширення файлу не .onnx"); return; }
@@ -742,7 +655,7 @@ function retarget(x, y, z) {
 let pending = 0;
 function recompute(opt) {
   syncK(); syncPlan();
-  $("busy").textContent = "Рахую епізод…";
+  $("busy").setAttribute("label", "Рахую епізод…");
   if (!(opt && opt.keep !== undefined)) $("busy").hidden = false;
   else $("hBusy").hidden = false;                          // відтворення триває, а епізод перераховується — спінер у HUD
   const my = ++pending;
@@ -800,33 +713,37 @@ const DEFS = {
   dur: ["тривалість симуляції", "Стандарт — 30 с; довше — якщо ввімкнено «продовжити після 30 с» і рій ще не долетів."],
 };
 $("defsList").innerHTML = Object.values(DEFS).map(([l, d]) => `<dt>${esc(l)}</dt><dd>${esc(d)}</dd>`).join("");
-const ICON = { "state-ok": "✓", "state-bad": "✗", "state-warn": "⚠" }, SR = { "state-ok": "добре", "state-bad": "погано", "state-warn": "увага" };
-function kpiCard(key, value, state, extra = "", small = false) {
-  const [label, def] = DEFS[key];
-  return `<div class="kpi ${state || ""} ${extra}" title="${esc(def)}"><b${small ? ' class="sm"' : ""}>${state ? `<i aria-hidden="true">${ICON[state]}</i>` : ""}${value}</b>` +
-    `<span>${esc(label)} <span class="q" aria-hidden="true">ⓘ</span></span>${state ? `<span class="sr"> — ${SR[state]}</span>` : ""}</div>`;
-}
+// показники зі станом (добре / погано / увага) — у cs-key-value з тоном (колір і значок), решта — у cs-stat-group;
+// визначення — у підказці рядка (title) і в «Що означають показники»
+const TONE = { "state-ok": "success", "state-bad": "danger", "state-warn": "warning" };
+const attrs = o => Object.entries(o).filter(([, v]) => v !== undefined && v !== null && v !== "").map(([k, v]) => ` ${k}="${esc(v)}"`).join("");
+const kv = (key, value, unit, state, note) => `<cs-kv${attrs({ label: DEFS[key][0], value, unit, tone: TONE[state], note, title: DEFS[key][1] })}></cs-kv>`;
+const stat = (key, value, unit, note) => `<cs-stat${attrs({ label: DEFS[key][0], value, unit, note, title: DEFS[key][1] })}></cs-stat>`;
 function renderKpis() {
   const { m, n } = st.ep, lost = st.ep.events.length, arrT = st.ep.arrive === null ? null : st.ep.arrive * P.dt;
   const pill = $("epPill");
-  pill.className = "pill " + (m.success ? "ok" : !m.no_event ? "bad" : "warn");
-  pill.textContent = m.success ? "місію виконано" : !m.no_event ? "подія о " + fmt(m.survival_time, 2) + " с" : "без подій, не всі біля цілі";
+  pill.hidden = false;
+  pill.setAttribute("tone", m.success ? "success" : !m.no_event ? "danger" : "warning");
+  pill.text = m.success ? "місію виконано" : !m.no_event ? "подія о " + fmt(m.survival_time, 2) + " с" : "без подій, не всі біля цілі";
   const why = m.success ? "без подій, увесь рій побував біля цілі"
     : !m.no_event ? `подія о ${fmt(m.survival_time, 2)} с` : `без подій, але біля цілі побували ${pct(m.goal_reach_rate)} дронів`;
   const ms = m.min_separation, msState = ms < P.crash_dist ? "state-bad" : ms < P.crash_dist + 0.3 ? "state-warn" : "state-ok";
   const rey = isRey(st.ep.ctrl || ctrls.get(st.ctrl));
-  $("kpis").innerHTML = [
-    kpiCard("success", (m.success ? "так" : "ні") + ` <small>${esc(why)}</small>`, m.success ? "state-ok" : "state-bad", "wide"),
-    kpiCard("survival_time", m.no_event ? `подій немає <small>${fmt(m.survival_time, 1)} с</small>` : fmt(m.survival_time, 2) + " с", m.no_event ? "state-ok" : "state-bad", "", m.no_event),
-    kpiCard("min_separation", fmt(ms, 2) + " м", msState),
-    kpiCard("lost", `${lost} з ${n}`, lost ? "state-bad" : "state-ok"),
-    kpiCard("goal_reach_rate", pct(m.goal_reach_rate), m.goal_reach_rate >= 1 - 1e-9 ? "state-ok" : ""),
-    kpiCard("arrive", arrT === null ? "не долетів" : fmt(arrT, 1) + " с", arrT === null ? "state-bad" : m.success ? "state-ok" : ""),
-    kpiCard("order_parameter", fmt(m.order_parameter, 3) + " <small>(0…1)</small>", ""),
-    kpiCard("formation_std", fmt(m.formation_std, 2) + " м", ""),
-    kpiCard("online_mse", rey ? "— <small>Рейнольдс — сам вчитель</small>" : fmtMse(m.online_mse) + " <small>σ²</small>", ""),
-    kpiCard("inference_hz", Number.isFinite(m.inference_hz) ? Math.round(m.inference_hz) + " Гц" : "—", ""),
-    kpiCard("dur", fmt(st.ep.dur, 1) + " с", ""),
+  $("kpiState").innerHTML = [
+    kv("success", m.success ? "так" : "ні", "", m.success ? "state-ok" : "state-bad", why),
+    m.no_event ? kv("survival_time", "подій немає", "", "state-ok", `${fmt(m.survival_time, 1)} с`)
+      : kv("survival_time", fmt(m.survival_time, 2), "с", "state-bad"),
+    kv("min_separation", fmt(ms, 2), "м", msState),
+    kv("lost", `${lost} з ${n}`, "", lost ? "state-bad" : "state-ok"),
+    kv("goal_reach_rate", pct(m.goal_reach_rate), "", m.goal_reach_rate >= 1 - 1e-9 ? "state-ok" : ""),
+    kv("arrive", arrT === null ? "не долетів" : fmt(arrT, 1), arrT === null ? "" : "с", arrT === null ? "state-bad" : m.success ? "state-ok" : ""),
+  ].join("");
+  $("kpiStats").innerHTML = [
+    stat("order_parameter", fmt(m.order_parameter, 3), "", "від 0 до 1"),
+    stat("formation_std", fmt(m.formation_std, 2), "м"),
+    rey ? stat("online_mse", "—", "", "Рейнольдс — сам вчитель") : stat("online_mse", fmtMse(m.online_mse), "σ²"),
+    stat("inference_hz", Number.isFinite(m.inference_hz) ? String(Math.round(m.inference_hz)) : "—", Number.isFinite(m.inference_hz) ? "Гц" : ""),
+    stat("dur", fmt(st.ep.dur, 1), "с"),
   ].join("");
   const longer = st.ep.dur > P.duration + 1e-9;                 // довідкові числа — лише за 30 с
   const r = st.set === "free" || st.ep.edited || st.ep.sc.goal0 || longer ? null : refFor(st.ctrl, st.set, rey ? null : st.k, n);
@@ -834,7 +751,7 @@ function renderKpis() {
   $("refLine").title = HAS_REF ? policy : "";
   if (r && r.survival) {
     const ref = r.survival[st.idx], q = agree(ref, m.survival_time);
-    $("refLine").innerHTML = `<span>довідка (reference_metrics): час без подій ${fmt(ref, 2)} с</span><span class="pill ${q ? "ok" : "warn"}" title="${AGREE_HINT}">${q === 2 ? "збіг ✓" : q ? "≈ збіг" : "розбіжність"}</span>`;
+    $("refLine").innerHTML = `<span>довідка (reference_metrics): час без подій ${fmt(ref, 2)} с</span><cs-tag tone="${q ? "success" : "warning"}" title="${AGREE_HINT}">${q === 2 ? "збіг" : q ? "≈ збіг" : "розбіжність"}</cs-tag>`;
     return;
   }
   const notes = [];
@@ -876,19 +793,21 @@ function markStale() {
   out.classList.toggle("stale", !same);
   let note = out.querySelector(".staleNote");
   if (same) { if (note) note.remove(); return; }
-  if (!note) { note = document.createElement("div"); note.className = "staleNote"; out.prepend(note); }
-  note.innerHTML = `<span>Результат для: ${esc(runDescr(b))} — не для поточних налаштувань.</span><button class="b" type="button">Перерахувати</button>`;
-  note.querySelector("button").onclick = () => (b.kind === "ladder" ? $("ladderBtn") : $("batchBtn")).click();
+  if (note) note.remove();
+  note = document.createElement("cs-banner"); note.className = "staleNote"; note.setAttribute("tone", "warning");
+  note.innerHTML = `Результат для: ${esc(runDescr(b))} — не для поточних налаштувань.<cs-button slot="action" size="sm">Перерахувати</cs-button>`;
+  out.prepend(note);
+  note.querySelector("cs-button").onclick = () => (b.kind === "ladder" ? $("ladderBtn") : $("batchBtn")).click();
 }
 // прогрес: «ind» — невизначений (симулятор рахує весь набір одним запитом), число 0…1 — частка, null — готово
 function progress(mode, text) {
-  $("barBox").classList.toggle("ind", mode === "ind");
-  $("bar").style.width = mode === "ind" ? "" : mode === null ? "0" : 100 * mode + "%";
+  if (mode === "ind") $("barBox").removeAttribute("value");                // невизначений: рухома смужка
+  else $("barBox").setAttribute("value", mode === null ? 0 : Math.round(100 * mode));
   $("batchStatus").textContent = text || "";
 }
-function setBusy(b) { $("batchBtn").disabled = b; $("ladderBtn").disabled = b || !!STATIC; }
-const resPill = f => (f.success ? '<span class="pill ok">✓ успіх</span>' : !f.noEvent ? '<span class="pill bad">✗ подія</span>'
-  : f.success === null ? '<span class="pill ok">без подій</span>' : '<span class="pill warn">не всі біля цілі</span>');
+function setBusy(b) { dis($("batchBtn"), b); dis($("ladderBtn"), b || STATIC); }
+const resPill = f => (f.success ? '<cs-tag tone="success">успіх</cs-tag>' : !f.noEvent ? '<cs-tag tone="danger">подія</cs-tag>'
+  : f.success === null ? '<cs-tag tone="success">без подій</cs-tag>' : '<cs-tag tone="warning">не всі біля цілі</cs-tag>');
 $("batchBtn").onclick = async () => {
   if (st.set === "free") { toast("Пакетний прогін — для фіксованих наборів (публічні / приховані)", "info"); return; }
   // стан — на момент запуску: користувач може змінити набір / контролер / k, поки прогін триває
@@ -911,11 +830,11 @@ $("batchBtn").onclick = async () => {
       ${sumRow("сер. час без подій", fmt(s.surv, 1) + " с", ref ? fmt(ref.survival_time, 1) + " с" : "—")}
       ${sumRow("online MSE", fmtMse(s.omse), ref && ref.online_mse !== undefined ? fmtMse(ref.online_mse) : "—")}</div>
       <p class="hint">${esc(c0.label)}, ${esc(setLabel(setKey))}, ${esc(kText(c0, k0))}: ${res.length} еп.${ms ? ` за ${fmt(ms / 1000, 1)} с` : ""}${ref ? ` · збіг із довідкою: ${same}/${res.length} <span title="${AGREE_HINT}">ⓘ</span>` : ""}${STATIC ? "" : " · стандартні цілі, 30 с"}</p>
-      <div class="tablewrap"><table><thead><tr><th>№</th><th>N</th><th title="час до першої події, с (без подій — 30 с)">час, с</th>${H ? '<th title="reference_metrics.json">довідка</th>' : ""}<th>результат</th><th>online MSE</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-    $("batchOut").querySelector("tbody").onclick = e => {
-      const tr = e.target.closest("tr"); if (!tr) return;
+      <cs-table selectable max-height="280"><table><caption class="cs-sr-only">Епізоди пакетного прогону</caption><thead><tr><th data-type="number">№</th><th data-type="number">N</th><th data-type="number" title="час до першої події, с (без подій — 30 с)">час, с</th>${H ? '<th data-type="number" title="reference_metrics.json">довідка</th>' : ""}<th>результат</th><th data-type="number">online MSE</th></tr></thead><tbody>${rows}</tbody></table></cs-table>`;
+    $("batchOut").querySelector("cs-table").addEventListener("rowactivate", e => {
+      const tr = e.detail.row; if (!tr) return;
       st.set = setKey; st.idx = +tr.dataset.i; st.goalPlan = []; useDefaultGoal(); syncSet(); recompute();   // як вибір у списку
-    };
+    });
     st.batchFor = { kind: "batch", set: setKey, ctrl: ctrlId, k: k0 }; markStale();
     progress(null, STATIC ? "" : `Готово: ${res.length} епізодів.`);
   } catch (e) { progress(null, ""); toast("Пакетний прогін не вдався: " + e.message, true); }
@@ -934,16 +853,16 @@ $("ladderBtn").onclick = async () => {
     }
     const H = HAS_REF;
     $("batchOut").className = "";
-    $("batchOut").innerHTML = `<table class="ladtab" style="margin-top:8px"><thead><tr><th>дронів моделі</th><th>успіх місії</th><th>без подій</th>${H ? '<th title="успіх місії за reference_metrics.json">довідка</th>' : ""}<th>online MSE</th></tr></thead><tbody>` +
+    $("batchOut").innerHTML = `<cs-table><table><caption class="cs-sr-only">Драбина</caption><thead><tr><th>дронів моделі</th><th data-type="number">успіх місії</th><th data-type="number">без подій</th>${H ? '<th data-type="number" title="успіх місії за reference_metrics.json">довідка</th>' : ""}<th data-type="number">online MSE</th></tr></thead><tbody>` +
       out.map(([k, s, r]) => `<tr><td>${k === null ? "усі" : k}</td><td>${pct(s.success)}</td><td>${pct(s.noEvent)}</td>${H ? `<td>${r ? pct(r.success_rate) : "—"}</td>` : ""}<td>${fmtMse(s.omse)}</td></tr>`).join("") +
-      `</tbody></table><p class="hint">${esc(c.label)}, ${esc(setLabel(setKey))}. Якщо з 1 дроном моделі рій живий, а з усіма — ні, модель функцію вивчила, а ламається розподіл станів.</p>`;
+      `</tbody></table></cs-table><p class="hint">${esc(c.label)}, ${esc(setLabel(setKey))}. Якщо з 1 дроном моделі рій живий, а з усіма — ні, модель функцію вивчила, а ламається розподіл станів.</p>`;
     st.batchFor = { kind: "ladder", set: setKey, ctrl: ctrlId, k: null }; markStale();
     progress(1, "Драбину пораховано.");
   } catch (e) { progress(null, ""); toast("Драбина не вдалася: " + e.message, true); }
   setBusy(false);
 };
 if (STATIC) {
-  $("batchBtn").textContent = "Таблиця епізодів запису";
+  $("batchBtn").text = "Таблиця епізодів запису";
   $("ladderBtn").title = "Драбина рахує нові епізоди — лише в живому режимі (swarm-sim view --model … --variant …)";
   setBusy(false);
 }
@@ -953,7 +872,7 @@ const canvas = $("gl");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 const scene = new THREE.Scene();
-const SKY = 0x14213a;
+const SKY = new THREE.Color(stg("stage")).getHex();          // небо полігона — колір stage (завжди темний)
 scene.background = new THREE.Color(SKY);
 scene.fog = new THREE.Fog(SKY, 160, 360);
 const camera = new THREE.PerspectiveCamera(45, 1, 0.3, 8000);
@@ -964,18 +883,19 @@ const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(60, 120
 const W3 = (x, y, z) => new THREE.Vector3(x, z, -y);          // (x, y, z) симулятора → (x, y↑, −y) three.js
 
 // земля, сітка 10 м, межа зони (кільце радіуса 120 масштабується до P.zone_radius)
-const ground = new THREE.Mesh(new THREE.CircleGeometry(170, 64), new THREE.MeshLambertMaterial({ color: 0x1c2b40 }));
+const ground = new THREE.Mesh(new THREE.CircleGeometry(170, 64), new THREE.MeshLambertMaterial({ color: stg("surface-panel") }));
 ground.rotation.x = -Math.PI / 2; scene.add(ground);
-const grid = new THREE.GridHelper(240, 24, 0x41618c, 0x2b3f5c); grid.position.y = 0.02; scene.add(grid);
+const GRID = [new THREE.Color(stg("ink-disabled")), new THREE.Color(stg("line"))];   // осі й клітинки 10 м
+const grid = new THREE.GridHelper(240, 24, GRID[0], GRID[1]); grid.position.y = 0.02; scene.add(grid);
 // для розширеної зони — більша сітка з тими самими клітинками 10 м (масштабування зробило б клітинки завеликими)
 let gridSize = 240;
 function gridFor(zoneR) {
   const size = zoneR <= 120 ? 240 : Math.ceil((zoneR + 50) / 100) * 200;
   if (size === gridSize) return;
   gridSize = size; grid.geometry.dispose();
-  grid.geometry = new THREE.GridHelper(size, size / 10, 0x41618c, 0x2b3f5c).geometry;
+  grid.geometry = new THREE.GridHelper(size, size / 10, GRID[0], GRID[1]).geometry;
 }
-const zone = new THREE.Mesh(new THREE.RingGeometry(119.6, 120.4, 128), new THREE.MeshBasicMaterial({ color: 0x7a4b28, side: THREE.DoubleSide }));
+const zone = new THREE.Mesh(new THREE.RingGeometry(119.6, 120.4, 128), new THREE.MeshBasicMaterial({ color: stg("warning"), side: THREE.DoubleSide }));   // межа зони
 zone.rotation.x = -Math.PI / 2; zone.position.y = 0.04; scene.add(zone);
 
 // сцена «Кремль»: карта 1:1 (x — схід, y — північ), прив'язана так, що ціль рою лежить у точці місця
@@ -1136,14 +1056,15 @@ async function setMap(placeId, provId) {
   }
 }
 
-// ціль: сфера досягнення 5 м, промінь до землі, кільце на землі
+// ціль: сфера досягнення 5 м, промінь до землі, кільце на землі; колір — серія 4 (як у легенді сцени)
+const GOAL_C = series(4);
 const goalG = new THREE.Group(); scene.add(goalG);
-const goalSphere = new THREE.Mesh(new THREE.SphereGeometry(5, 24, 16), new THREE.MeshBasicMaterial({ color: 0x2fbf72, transparent: true, opacity: 0.1, depthWrite: false }));
-const goalCore = new THREE.Mesh(new THREE.OctahedronGeometry(0.8), new THREE.MeshBasicMaterial({ color: 0x3ddc84 }));
+const goalSphere = new THREE.Mesh(new THREE.SphereGeometry(5, 24, 16), new THREE.MeshBasicMaterial({ color: GOAL_C, transparent: true, opacity: 0.1, depthWrite: false }));
+const goalCore = new THREE.Mesh(new THREE.OctahedronGeometry(0.8), new THREE.MeshBasicMaterial({ color: GOAL_C }));
 const beamGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
-const goalBeam = new THREE.Line(beamGeo, new THREE.LineBasicMaterial({ color: 0x2fbf72, transparent: true, opacity: 0.5 }));
+const goalBeam = new THREE.Line(beamGeo, new THREE.LineBasicMaterial({ color: GOAL_C, transparent: true, opacity: 0.5 }));
 goalBeam.frustumCulled = false;     // геометрія оновлюється, а boundingSphere — ні: інакше промінь зникав
-const goalRing = new THREE.Mesh(new THREE.RingGeometry(4.6, 5, 48), new THREE.MeshBasicMaterial({ color: 0x2fbf72, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
+const goalRing = new THREE.Mesh(new THREE.RingGeometry(4.6, 5, 48), new THREE.MeshBasicMaterial({ color: GOAL_C, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
 goalRing.rotation.x = -Math.PI / 2;
 goalG.add(goalSphere, goalCore, goalRing); scene.add(goalBeam);
 
@@ -1160,7 +1081,8 @@ function neighbors(stt, i) {
 }
 
 // дрони
-const COL = { expert: 0x2f86e0, nn: 0xe8860c, dead: 0x5b6577 };
+// ролі — серії Core System з підписами в легенді: Рейнольдс — серія 2 (бірюзова), модель — серія 1 (глина)
+const COL = { expert: new THREE.Color(series(2)).getHex(), nn: new THREE.Color(series(1)).getHex(), dead: new THREE.Color(stg("ink-disabled")).getHex() };
 // Модель квадрокоптера (локальні осі: +x — ніс, y — угору, z — праворуч; розмах між осями моторів ≈ 0,57 м, як у
 // дрона класу 0,6 м). Колір ролі має корпус; промені, мотори й шасі — темний карбон, пропелери обертаються
 // (сусідні — у протилежні боки), навігаційні вогні: спереду зелені, ззаду червоні, зверху — білий проблисковий.
@@ -1223,12 +1145,12 @@ function buildQuad() {
 const ringGeo = new THREE.TorusGeometry(0.55, 0.035, 8, 32);
 let drones = [];
 const trailLen = 120;
-const linkGeo = new THREE.BufferGeometry(), linkMat = new THREE.LineBasicMaterial({ color: 0x8fb3e6, transparent: true, opacity: 0.32 });
+const linkGeo = new THREE.BufferGeometry(), linkMat = new THREE.LineBasicMaterial({ color: stg("overlay-muted"), transparent: true, opacity: 0.32 });
 const links = new THREE.LineSegments(linkGeo, linkMat); scene.add(links); links.frustumCulled = false;
 const LINK_MAX = 16 * 8 * 2;                                       // до 16 дронів × 8 сусідів, по 2 точки
 linkGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(LINK_MAX * 3), 3));
 const posNow = [];                                                 // інтерпольовані позиції дронів поточного кадру
-const crashMat = new THREE.MeshBasicMaterial({ color: 0xf05252 });
+const crashMat = new THREE.MeshBasicMaterial({ color: stg("danger") });
 // Екранні маркери дронів: сталий розмір у пікселях (sizeAttenuation: false), видно й крізь будівлі (depthTest: false).
 // Форма дублює колір ролі: кружок — Рейнольдс, ромб — модель, хрестик — дрон вибув. Зблизька, коли корпус і так
 // великий, маркер блідне.
@@ -1237,16 +1159,16 @@ function markerTex(shape, fill) {
   const g = c.getContext("2d"); g.lineJoin = "round"; g.lineCap = "round";
   if (shape === "cross") {
     g.beginPath(); g.moveTo(16, 16); g.lineTo(48, 48); g.moveTo(48, 16); g.lineTo(16, 48);
-    g.strokeStyle = "#0b1320"; g.lineWidth = 17; g.stroke(); g.strokeStyle = fill; g.lineWidth = 9; g.stroke();
+    g.strokeStyle = stg("stage"); g.lineWidth = 17; g.stroke(); g.strokeStyle = fill; g.lineWidth = 9; g.stroke();
   } else {
     g.beginPath();
     if (shape === "circle") g.arc(32, 32, 22, 0, 2 * Math.PI);
     else { g.moveTo(32, 3); g.lineTo(61, 32); g.lineTo(32, 61); g.lineTo(3, 32); g.closePath(); }
-    g.fillStyle = fill; g.fill(); g.lineWidth = 6; g.strokeStyle = "#0b1320"; g.stroke();
+    g.fillStyle = fill; g.fill(); g.lineWidth = 6; g.strokeStyle = stg("stage"); g.stroke();
   }
   return new THREE.CanvasTexture(c);
 }
-const MK = { expert: markerTex("circle", "#2f86e0"), nn: markerTex("diamond", "#e8860c"), dead: markerTex("cross", "#8a94a6") };
+const MK = { expert: markerTex("circle", series(2)), nn: markerTex("diamond", series(1)), dead: markerTex("cross", stg("overlay-muted")) };
 const MK_PX = 14;                                                  // розмір спрайта маркера, CSS-пікселі
 // спільні геометрії, матеріали й текстури не звільняємо; решту (власні матеріали, сліди, підписи) — так
 const SHARED = new Set([bodyGeo, canopyGeo, batteryGeo, armGeo, motorGeo, capGeo, bladeGeo, discGeo, legGeo, skidGeo, gimbalGeo,
@@ -1264,7 +1186,7 @@ function disposeObj(o) {
 let crashMarks = [];
 function makeLabel(text) {
   const c = document.createElement("canvas"); c.width = 64; c.height = 32;
-  const g = c.getContext("2d"); g.font = "600 22px system-ui, sans-serif"; g.fillStyle = "#e6edf7"; g.textAlign = "center"; g.fillText(text, 32, 24);
+  const g = c.getContext("2d"); g.font = "600 22px " + stg("font-sans"); g.fillStyle = stg("overlay-ink"); g.textAlign = "center"; g.fillText(text, 32, 24);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false, transparent: true }));
   s.scale.set(1.6, 0.8, 1); return s;
 }
@@ -1293,11 +1215,11 @@ function buildDrones() {
     trail.frustumCulled = false;     // точки сліду змінюються щокадру (див. goalBeam)
     scene.add(trail);
     const pinGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
-    const pin = new THREE.Line(pinGeo, new THREE.LineBasicMaterial({ color: 0x41536d, transparent: true, opacity: 0.6 })); scene.add(pin);
+    const pin = new THREE.Line(pinGeo, new THREE.LineBasicMaterial({ color: stg("ink-disabled"), transparent: true, opacity: 0.6 })); scene.add(pin);
     pin.frustumCulled = false;
-    const dot = new THREE.Mesh(new THREE.CircleGeometry(0.35, 16), new THREE.MeshBasicMaterial({ color: 0x41536d, transparent: true, opacity: 0.7 }));
+    const dot = new THREE.Mesh(new THREE.CircleGeometry(0.35, 16), new THREE.MeshBasicMaterial({ color: stg("ink-disabled"), transparent: true, opacity: 0.7 }));
     dot.rotation.x = -Math.PI / 2; scene.add(dot);
-    const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xf05252 })); ring.rotation.x = Math.PI / 2; ring.visible = false; scene.add(ring);
+    const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: stg("danger") })); ring.rotation.x = Math.PI / 2; ring.visible = false; scene.add(ring);
     const label = makeLabel(String(i)); scene.add(label);
     const mk = new THREE.Sprite(new THREE.SpriteMaterial({ map: MK.expert, sizeAttenuation: false, depthTest: false, depthWrite: false, transparent: true }));
     mk.renderOrder = 10; scene.add(mk);
@@ -1353,20 +1275,16 @@ function framesCamera(reset) {
   else if (reset || st.cam === "orbit") { camera.position.set(tgt.x - span * 0.75, tgt.y + span * 0.55, tgt.z + span * 0.75); }
   controls.target.copy(tgt); controls.update();
 }
-const camBtns = () => $("cams").querySelectorAll('[data-cam]:not([data-cam="goal"])');
-$("cams").onclick = e => {
-  const b = e.target.closest("button[data-cam]"); if (!b) return;
-  if (e.detail) canvas.focus({ preventScroll: true });       // клік мишею — фокус на сцену, щоб клавіші працювали далі
-  if (b.dataset.cam === "goal") { toGoal(); return; }
-  st.cam = b.dataset.cam;
-  for (const x of camBtns()) x.setAttribute("aria-pressed", x === b);
-  framesCamera(true);
+// режим камери — cs-segmented; «До цілі» — разова дія; довідка про мишу й клавіші — cs-popover (Esc і клік поза ним закривають)
+function setCam(cam) { st.cam = cam; $("camSeg").value = cam; framesCamera(true); }
+let camByPointer = false;
+$("camSeg").addEventListener("pointerdown", () => (camByPointer = true));
+$("camSeg").onchange = () => {
+  if (camByPointer) canvas.focus({ preventScroll: true });   // клік мишею — фокус на сцену, щоб клавіші працювали далі
+  camByPointer = false;
+  setCam($("camSeg").value);
 };
-// «?» біля камер — довідка про мишу й клавіші (замість абзацу в лівій панелі)
-const camHelp = on => { $("camHelp").hidden = !on; $("camHelpBtn").setAttribute("aria-expanded", String(on)); };
-$("camHelpBtn").onclick = () => camHelp($("camHelp").hidden);
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("camHelp").hidden) { camHelp(false); $("camHelpBtn").focus(); } });
-document.addEventListener("pointerdown", e => { if (!$("camHelp").hidden && !e.target.closest("#camHelp,#camHelpBtn")) camHelp(false); });
+$("camGoal").onclick = e => { if (e.detail) canvas.focus({ preventScroll: true }); toGoal(); };
 canvas.addEventListener("pointerdown", () => canvas.focus({ preventScroll: true }));
 // «До цілі»: камера одразу над поточною ціллю (з того ж боку, що й зараз), далі — звичайний огляд навколо неї
 function toGoal() {
@@ -1377,8 +1295,7 @@ function toGoal() {
   dir.normalize().multiplyScalar(45);
   camera.position.set(tgt.x + dir.x, tgt.y + 25, tgt.z + dir.z);
   controls.target.copy(tgt); controls.update();
-  st.cam = "orbit";
-  for (const x of camBtns()) x.setAttribute("aria-pressed", x.dataset.cam === "orbit");
+  st.cam = "orbit"; $("camSeg").value = "orbit";
 }
 function lerpFrame(fi) {
   const F = st.ep.frames, i0 = Math.min(Math.floor(fi), F.length - 1), i1 = Math.min(i0 + 1, F.length - 1), a = fi - i0;
@@ -1690,12 +1607,14 @@ const dirName = (vx, vy) => DIRS[((Math.round((Math.PI / 2 - Math.atan2(vy, vx))
 function drawCompass(f0) {
   const c = $("compass"), g = c.getContext("2d"), R = 40, cx = 56, cy = 48;
   g.clearRect(0, 0, c.width, c.height);
-  g.fillStyle = "#0e1a2bcc"; g.beginPath(); g.arc(cx, cy, R + 6, 0, 2 * Math.PI); g.fill();
-  g.strokeStyle = "#2b3d57"; g.lineWidth = 1; g.stroke();
+  const C = drawCompass.c ||= { bg: stg("overlay"), line: stg("overlay-line"), muted: stg("overlay-muted"), ink: stg("overlay-ink"),
+    wind: series(3), goal: series(4), font: stg("font-sans") };   // полігон завжди темний: кольори читаються один раз
+  g.fillStyle = C.bg; g.beginPath(); g.arc(cx, cy, R + 6, 0, 2 * Math.PI); g.fill();
+  g.strokeStyle = C.line; g.lineWidth = 1; g.stroke();
   // азимут камери, щоб стрілки збігались з екраном
   const az = Math.atan2(camera.position.x - controls.target.x, camera.position.z - controls.target.z);
   const na = Math.PI / 2 - az;                       // напрямок на північ на екрані
-  g.fillStyle = "#9fb0c8"; g.font = "600 10px system-ui"; g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillStyle = C.muted; g.font = "600 10px " + C.font; g.textAlign = "center"; g.textBaseline = "middle";
   g.fillText("ПН", cx + Math.cos(na) * (R - 4), cy - Math.sin(na) * (R - 4)); g.textBaseline = "alphabetic";
   const arrow = (vx, vy, len, col, wdt) => {
     const ang = Math.atan2(vy, vx) - az;            // світ (x — схід, y — північ) → екран (камера дивиться вздовж −az)
@@ -1704,28 +1623,22 @@ function drawCompass(f0) {
     g.fillStyle = col; g.beginPath(); g.arc(ex, ey, wdt + 1.5, 0, 2 * Math.PI); g.fill();
   };
   const w = st.ep.sc.wind, wn = Math.hypot(w[0], w[1]);
-  if (wn > 0.05) arrow(w[0], w[1], Math.min(R - 4, 10 + 4 * wn), "#7fb5ff", 3);
+  if (wn > 0.05) arrow(w[0], w[1], Math.min(R - 4, 10 + 4 * wn), C.wind, 3);
   const gc = st.ep.goals[f0.gi], c0 = centroid(f0), gx = gc[0] - c0[0], gy = gc[1] - c0[1];
-  arrow(gx, gy, R - 6, "#3ddc84", 2);
-  g.font = "600 11px system-ui"; g.textAlign = "left";
-  g.fillStyle = "#0e1a2bcc"; g.beginPath(); g.roundRect ? g.roundRect(2, 96, 108, 35, 6) : g.rect(2, 96, 108, 35); g.fill();
-  g.fillStyle = "#7fb5ff"; g.fillRect(8, 104, 12, 3); g.fillStyle = "#dfe7f3"; g.fillText(`вітер ${fmt(wn, 1)} м/с`, 25, 109);
-  g.fillStyle = "#3ddc84"; g.fillRect(8, 121, 12, 2); g.fillStyle = "#dfe7f3"; g.fillText("на ціль", 25, 126);
+  arrow(gx, gy, R - 6, C.goal, 2);
+  g.font = "500 11px " + C.font; g.textAlign = "left";
+  g.fillStyle = C.bg; g.beginPath(); g.roundRect ? g.roundRect(2, 96, 108, 35, 4) : g.rect(2, 96, 108, 35); g.fill();
+  g.fillStyle = C.wind; g.fillRect(8, 104, 12, 3); g.fillStyle = C.ink; g.fillText(`вітер ${fmt(wn, 1)} м/с`, 25, 109);
+  g.fillStyle = C.goal; g.fillRect(8, 121, 12, 2); g.fillStyle = C.ink; g.fillText("на ціль", 25, 126);
   const lab = `Компас: вітер ${fmt(wn, 1)} м/с ${wn > 0.05 ? "на " + dirName(w[0], w[1]) : ""}; ціль — на ${dirName(gx, gy)} від рою`;
   if (c._lab !== lab) { c._lab = lab; c.setAttribute("aria-label", lab); }
 }
 // тост: kind — true / "bad" (помилка, червоний), "ok" (успіх, зелений), інше — нейтральний. Живе ≈ 60 мс на символ
 // (не менше 4 с, помилки — не менше 7 с), закривається кнопкою ×; текст можна виділити й скопіювати.
 function toast(msg, kind) {
-  const t = $("toast"), bad = kind === true || kind === "bad";
-  $("toastTx").textContent = msg;
-  t.className = "on " + (bad ? "bad" : kind === "ok" ? "" : "info");
-  clearTimeout(toast.h);
-  toast.h = setTimeout(() => t.classList.remove("on"), Math.max(bad ? 7000 : 4000, 60 * msg.length));
+  const bad = kind === true || kind === "bad";
+  CoreSystem.toast(msg, { tone: bad ? "danger" : kind === "ok" ? "success" : "info", duration: Math.max(bad ? 8000 : 4000, 60 * msg.length) });
 }
-$("toastX").onclick = () => { clearTimeout(toast.h); $("toast").classList.remove("on"); };
-$("toast").onpointerenter = () => clearTimeout(toast.h);          // під курсором не зникає
-$("toast").onpointerleave = () => { if ($("toast").classList.contains("on")) toast.h = setTimeout(() => $("toast").classList.remove("on"), 2500); };
 
 // ---------------------------------------------------------------- графіки телеметрії
 // Повне перемальовування (зміна розміру canvas + getComputedStyle) 20 разів за секунду давало помітні ривки
@@ -1742,7 +1655,7 @@ function chart(canvasId, build) {
     if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; }
     const bg = (c && c.bg) || document.createElement("canvas");
     bg.width = W * dpr; bg.height = H * dpr;
-    c = chartCache[canvasId] = Object.assign({ key, bg, accent: css("--accent") }, drawChartBg(bg, dpr, W, H, ...build()));
+    c = chartCache[canvasId] = Object.assign({ key, bg, accent: css("--primary") }, drawChartBg(bg, dpr, W, H, ...build()));
   }
   const g = cv.getContext("2d");
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.drawImage(c.bg, 0, 0);
@@ -1753,8 +1666,8 @@ function chart(canvasId, build) {
 function drawChartBg(cv, dpr, W, H, series, opt) {
   const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
   const L = 30, Rm = 16, T = 6, B = 16, pw = W - L - Rm, ph = H - T - B;     // Rm — щоб остання мітка осі «30 с» влазила
-  const ink = css("--muted"), gridC = css("--chart-grid");
-  g.font = "10px " + css("--sans"); g.fillStyle = ink; g.strokeStyle = gridC; g.lineWidth = 1;
+  const ink = css("--ink-muted"), gridC = css("--line");                      // осі — ink-muted, сітка — line
+  g.font = "10px " + css("--font-mono"); g.fillStyle = ink; g.strokeStyle = gridC; g.lineWidth = 1;
   const TT = Math.max(st.ep.dur, 1), X = t => L + pw * t / TT, Y = v => T + ph * (1 - (opt.tf(v) - opt.tf(opt.lo)) / (opt.tf(opt.hi) - opt.tf(opt.lo)));
   for (const v of opt.ticks) { const y = Math.round(Y(v)) + 0.5; g.beginPath(); g.moveTo(L, y); g.lineTo(L + pw, y); g.stroke(); g.textAlign = "right"; g.fillText(opt.lab ? opt.lab(v) : String(v).replace(".", ","), L - 4, y + 3); }
   const step = TT <= 40 ? 10 : TT <= 120 ? 30 : TT <= 300 ? 60 : TT <= 600 ? 120 : 300;
@@ -1768,9 +1681,9 @@ function drawChartBg(cv, dpr, W, H, series, opt) {
   g.lineWidth = 1;
   const fe = st.ep.firstEvent;
   if (Number.isFinite(fe)) {                                   // ▒ — після першої події (метрики φ і розкиду — лише до неї)
-    g.fillStyle = css("--bad"); g.globalAlpha = 0.12; g.fillRect(X(fe), T, L + pw - X(fe), ph); g.globalAlpha = 1;
+    g.fillStyle = css("--danger"); g.globalAlpha = 0.12; g.fillRect(X(fe), T, L + pw - X(fe), ph); g.globalAlpha = 1;
     g.fillRect(X(fe), T, 1.5, ph);
-    if (L + pw - X(fe) > 58) { g.textAlign = "left"; g.fillStyle = css("--bad-ink"); g.fillText("після події", X(fe) + 4, T + 9); }
+    if (L + pw - X(fe) > 58) { g.textAlign = "left"; g.fillStyle = css("--danger"); g.fillText("після події", X(fe) + 4, T + 9); }
   }
   g.strokeStyle = opt.color; g.lineWidth = 1.5; g.beginPath();
   let pen = false;
@@ -1786,13 +1699,13 @@ function drawCharts() {
   if (!st.ep) return;
   const r = st.ep.rec, ln = Math.log10;
   // серії — нейтральним кольором (не синій / помаранчевий / зелений легенди ролей сцени)
-  chart("chMs", () => [r.minsep, { lo: 0, hi: 8, ticks: [0, 2, 4, 6, 8], tf: v => v, color: css("--series"),
-    lines: [{ v: P.crash_dist, c: css("--bad-ink"), dash: [6, 3], label: `зіткнення ${fmt(P.crash_dist, 1)}` },
-      { v: P.crash_dist + 0.3, c: css("--warn-ink"), dash: [1.5, 3], label: `небезпека ${fmt(P.crash_dist + 0.3, 1)}`, above: true }] }]);
+  chart("chMs", () => [r.minsep, { lo: 0, hi: 8, ticks: [0, 2, 4, 6, 8], tf: v => v, color: css("--ink"),
+    lines: [{ v: P.crash_dist, c: css("--danger"), dash: [6, 3], label: `зіткнення ${fmt(P.crash_dist, 1)}` },
+      { v: P.crash_dist + 0.3, c: css("--warning"), dash: [1.5, 3], label: `небезпека ${fmt(P.crash_dist + 0.3, 1)}`, above: true }] }]);
   const om = r.omse;
-  chart("chMse", () => [om, { lo: 1e-3, hi: 1e2, ticks: [1e-3, 1e-2, 1e-1, 1, 10, 100], tf: v => ln(Math.max(v, 1e-3)), color: css("--series"),
+  chart("chMse", () => [om, { lo: 1e-3, hi: 1e2, ticks: [1e-3, 1e-2, 1e-1, 1, 10, 100], tf: v => ln(Math.max(v, 1e-3)), color: css("--ink"),
     lab: v => (v >= 1 ? String(v) : "1e" + Math.round(ln(v))) }]);
-  chart("chPhi", () => [r.phi, { lo: 0, hi: 1, ticks: [0, 0.5, 1], tf: v => v, color: css("--series") }]);
+  chart("chPhi", () => [r.phi, { lo: 0, hi: 1, ticks: [0, 0.5, 1], tf: v => v, color: css("--ink") }]);
   const k = Math.min(Math.floor(st.f), r.minsep.length - 1);
   const vMs = fmt(r.minsep[k], 2) + " м", vMse = fmtMse(om[k]), vPhi = fmt(r.phi[k], 2);
   $("cMs").textContent = vMs; $("cMse").textContent = vMse; $("cPhi").textContent = vPhi;
@@ -1840,8 +1753,9 @@ document.addEventListener("click", () => { for (const x of document.querySelecto
 $("lyMarkers").checked = st.layers.markers;
 $("lyMarkers").onchange = e => { st.layers.markers = e.target.checked; store.set("lab4-markers", st.layers.markers ? "1" : "0"); renderFrame(); };
 for (const [id, k] of [["lyTrails", "trails"], ["lyLinks", "links"], ["lyRings", "rings"], ["lyLabels", "labels"]]) $(id).onchange = e => { st.layers[k] = e.target.checked; userLayers = true; renderFrame(); };
-$("scaleR").value = st.scale; $("scaleV").textContent = "×" + String(st.scale).replace(".", ",");
-$("scaleR").oninput = () => { st.scale = +$("scaleR").value; $("scaleV").textContent = "×" + String(st.scale).replace(".", ","); renderFrame(); };
+$("scaleR").formatValue = v => "×" + String(v).replace(".", ",");
+$("scaleR").value = st.scale;
+$("scaleR").oninput = () => { st.scale = +$("scaleR").value; renderFrame(); };
 const camKeys = new Set(), CAM_KEYS = ["KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE"];
 document.addEventListener("keyup", e => camKeys.delete(e.code));
 window.addEventListener("blur", () => camKeys.clear());
@@ -1857,7 +1771,7 @@ document.addEventListener("keydown", e => {
   }
   if (CAM_KEYS.includes(e.code) && !e.ctrlKey && !e.metaKey && !e.altKey) {
     e.preventDefault(); camKeys.add(e.code);
-    if (st.cam === "follow") $("cams").querySelector('[data-cam="orbit"]').click();   // «за роєм» інакше поверне камеру
+    if (st.cam === "follow") setCam("orbit");                    // «за роєм» інакше поверне камеру
     if (!e.repeat) moveCam(0.08);   // коротке натискання теж зсуває камеру, навіть якщо між keydown і keyup немає кадру
     return;
   }
@@ -1923,7 +1837,7 @@ function loop(now) {
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
   let picking = false, down = null, lastPick = 0;
   const setPick = on => {
-    picking = on; canvas.classList.toggle("pick", on); $("gPick").setAttribute("aria-pressed", on);
+    picking = on; canvas.classList.toggle("pick", on); $("gPick").setAttribute("pressed", String(on));
     if (on) toast("Клікніть на сцені — рій полетить туди з поточного моменту");
   };
   $("gPick").onclick = () => setPick(!picking);
@@ -1953,17 +1867,17 @@ function loop(now) {
   const place = MAPS.places.find(p => p.id === MAPS.default_place) || MAPS.places[0];
   if (!place || (!CITY && !MAPS.providers.length)) { $("sceneSw").hidden = true; return; }
   const short = place.label.replace(/^Московський /, "");
-  $("sceneSw").querySelector('[data-scene="kremlin"]').textContent = short;
+
   const opts = (CITY ? [["city", "карта OSM, 3D-будівлі (вбудована)"]] : []).concat(MAPS.providers.map(p => [p.id, p.label + " (з мережі)"]));
-  $("mapProv").innerHTML = opts.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+  $("mapProv").select.innerHTML = opts.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
   const sp = store.get("lab4-mapprov");
   $("mapProv").value = opts.some(o => o[0] === sp) ? sp : opts[0][0];
   const apply = scene_ => {
     st.scene = scene_;
-    for (const b of $("sceneSw").children) b.setAttribute("aria-pressed", b.dataset.scene === scene_);
+    $("sceneSw").value = scene_ === "space" ? "space" : "kremlin";
     const isMap = scene_ !== "space", prov = $("mapProv").value;
-    $("mapProv").disabled = !isMap;
-    $("lgGoal").textContent = isMap ? `ціль — ${short} (5 м)` : "ціль (5 м)";
+    dis($("mapProv"), !isMap);
+    $("lgGoal").setAttribute("label", isMap ? `ціль — ${short} (5 м)` : "ціль (5 м)");
     simGround(!isMap); setSky(isMap ? "map" : "space");
     if (isMap && CITY) { buildCity(); cityG.visible = true; anchorMap(); } else cityG.visible = false;
     goalGround();
@@ -1972,11 +1886,9 @@ function loop(now) {
     else { setMap(null, null); $("mapNote").textContent = isMap ? `${CITY.label}: карта OSM ${Math.round(CITY.size_m)} × ${Math.round(CITY.size_m)} м, ${CITY.buildings.length} будівель; рій летить над дахами.` : "Сцена «3D-простір»: земля й сітка 10 м."; }
     store.set("lab4-scene", scene_);
   };
-  $("sceneSw").onclick = e => {
-    const b = e.target.closest("button"); if (!b) return;
-    apply(b.dataset.scene === "kremlin" ? place.id : "space");
+  $("sceneSw").onchange = () => {
+    apply($("sceneSw").value === "kremlin" ? place.id : "space");
     if (st.cam === "side" || st.cam === "top") framesCamera(true);    // висота камери «Збоку» залежить від сцени
-    if (e.detail) canvas.focus({ preventScroll: true });
   };
   $("mapProv").onchange = () => { store.set("lab4-mapprov", $("mapProv").value); if (st.scene !== "space") apply(st.scene); };
   const saved = store.get("lab4-scene");
@@ -1984,7 +1896,7 @@ function loop(now) {
 })();
 fillCtrls(); syncSet(); resize(); recompute(); requestAnimationFrame(loop);
 window.__player = { st, ctrls, runBatch, runEpisode, retarget, SETS, scene, camera, controls, THREE };   // для автоматичних перевірок
-})();
+});
 </script>
 </body>
 </html>
