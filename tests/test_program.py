@@ -291,7 +291,7 @@ def test_page_inlines_core_system():
     html = server.render({"P": {}, "sets": {}, "controllers": []})
     assert "<!--__CORE__-->" not in html and "/*__THREE__*/" not in html
     assert "customElements" in html and "--surface-lab" in html and "@font-face" in html
-    assert 'data-style="lab"' in html and '<html lang="uk">' in html
+    assert 'data-style="instrument"' in html and '<html lang="uk">' in html
     assert re.search(r'<(?:link|script)[^>]+(?:href|src)="https?://', html) is None
     core = server.CORE
     for f in ("tokens-embedded-lab.css", "components/bundle.css", "components/bundle.js", "LICENSE-lucide.txt",
