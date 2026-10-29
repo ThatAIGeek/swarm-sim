@@ -22,7 +22,8 @@ code{font:.92em var(--font-mono)}
   grid-template-areas:"head head head" "side stage right" "side dash right"}
 #head{grid-area:head;min-width:0}
 .logos{display:flex;align-items:center;gap:var(--space-2)}
-.logos img{height:36px;width:auto;border-radius:var(--radius-sm)}
+/* шапка завжди темна (data-theme="dark"), як і раніше: логотип Політехніки — білий, на світлому тлі його не видно */
+.logos img{height:40px;width:auto;border-radius:var(--radius-sm)}
 aside{background:var(--surface-raised);overflow-y:auto;min-width:0}
 #side{grid-area:side;border-right:1px solid var(--line);padding:var(--space-1) var(--space-3) var(--space-6)}
 #right{grid-area:right;border-left:1px solid var(--line);padding:var(--space-1) var(--space-3) var(--space-6)}
@@ -150,7 +151,7 @@ dl.defs{margin:0;font-size:13px;color:var(--ink-muted)} dl.defs dt{color:var(--i
 </head>
 <body data-style="lab">
 <div id="app">
-  <cs-app-header id="head" heading="Пульт рою · ЛР4" heading-level="1" subtitle="Імітаційне навчання контролера рою">
+  <cs-app-header id="head" data-theme="dark" heading="Пульт рою · ЛР4" heading-level="1" subtitle="Імітаційне навчання контролера рою">
     <span slot="brand" class="logos" id="logos"></span>
     <cs-tag slot="actions" id="mode">Студент</cs-tag>
     <cs-theme-toggle slot="actions"></cs-theme-toggle>
