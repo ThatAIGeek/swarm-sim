@@ -77,6 +77,8 @@ aside .cs-field :is(input,select){min-width:0;width:100%}
 #attrib{position:static;padding:2px var(--space-2);font-size:11px;max-width:420px;text-align:right;color:var(--overlay-muted)}
 #cams{display:flex;gap:var(--space-1);pointer-events:auto;flex-wrap:wrap;justify-content:flex-end;align-items:center}
 #camHelp p{margin:0 0 var(--space-1);font-size:13px}
+/* кнопки камери лежать на сцені: над світлою картою «Кремля» прозоре тло кнопки робить підпис невидимим */
+#cams .cs-btn:not(:hover){background:var(--surface-raised)}
 #busy{z-index:4}
 /* ---- шкала часу: рядок відтворення — свої правила, доки в системі немає компонента cs-playback */
 #dash{grid-area:dash;background:var(--surface-raised);border-top:1px solid var(--line);display:grid;grid-template-rows:auto 1fr;min-height:0}
