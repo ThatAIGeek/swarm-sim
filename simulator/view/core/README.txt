@@ -1,4 +1,4 @@
-Core System v4, generated 2026-10-29 by tools/export.js. Do not edit; edit project/tokens.json and re-run.
+Core System v5, generated 2026-11-19 by tools/export.js. Do not edit; edit project/tokens.json and re-run.
 
 Copy this folder into a project (for example static/core/) and load, in this order:
   <link rel="stylesheet" href="core/tokens.css">

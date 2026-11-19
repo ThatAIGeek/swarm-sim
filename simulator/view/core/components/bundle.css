@@ -191,33 +191,33 @@ code, kbd, samp, pre, .cs-mono { font-synthesis-weight: none; }
   --status-outline: 0%;
 }
 
-/* ---- Instrument colours: neutral paper and graphite instead of linen; clay stays the one action colour.
-   Generated: each swapped colour picks Clay or `tool-*` by the nearest style, and its value by the nearest theme. ---- */
+/* ---- Instrument colours: off-white and deep graphite with white cards; violet stays the one action colour.
+   Generated: each swapped colour picks the default or `tool-*` value by the nearest style, and its value by the nearest theme. ---- */
 /* @style-mirror:start (generated from tokens.json by tools/sync-type.js; do not edit) */
 :root, [data-theme="light"] { --on-light: initial; --on-dark: ; }
 [data-theme="dark"] { --on-light: ; --on-dark: initial; }
 :root, [data-theme][data-theme], [data-style][data-style] {
-  --surface: var(--on-default, var(--on-light, #f4efe6) var(--on-dark, #1c1915)) var(--on-lab, var(--on-light, #f5f5f3) var(--on-dark, #131415));
-  --surface-panel: var(--on-default, var(--on-light, #ece5d8) var(--on-dark, #28231d)) var(--on-lab, var(--on-light, #ececea) var(--on-dark, #1d1e20));
-  --surface-raised: var(--on-default, var(--on-light, #ffffff) var(--on-dark, #332d26)) var(--on-lab, var(--on-light, #ffffff) var(--on-dark, #1e1f22));
-  --surface-overlay: var(--on-default, var(--on-light, #ffffff) var(--on-dark, #38312a)) var(--on-lab, var(--on-light, #ffffff) var(--on-dark, #26282b));
-  --ink: var(--on-default, var(--on-light, #2a2520) var(--on-dark, #efe8dc)) var(--on-lab, var(--on-light, #1c1c1a) var(--on-dark, #e9e8e4));
-  --ink-muted: var(--on-default, var(--on-light, #6b6259) var(--on-dark, #b3a897)) var(--on-lab, var(--on-light, #5d5c58) var(--on-dark, #a3a29d));
-  --ink-disabled: var(--on-default, var(--on-light, #a39a8f) var(--on-dark, #7a7064)) var(--on-lab, var(--on-light, #a4a39e) var(--on-dark, #6b6a66));
-  --line: var(--on-default, var(--on-light, #cfc3af) var(--on-dark, #4b4339)) var(--on-lab, var(--on-light, #dedcd7) var(--on-dark, #34363a));
-  --wash: var(--on-default, var(--on-light, rgba(42, 37, 32, 0.08)) var(--on-dark, rgba(239, 232, 220, 0.06))) var(--on-lab, var(--on-light, rgba(28, 28, 26, 0.06)) var(--on-dark, rgba(233, 232, 228, 0.07)));
-  --primary-tint: var(--on-default, var(--on-light, #ead8cc) var(--on-dark, #3d2a1f)) var(--on-lab, var(--on-light, #f2e6de) var(--on-dark, #3b2a21));
-  --danger-tint: var(--on-default, var(--on-light, #f4dadf) var(--on-dark, #4a2620)) var(--on-lab, var(--on-light, #f4dadf) var(--on-dark, #3d2228));
-  --warning-tint: var(--on-default, var(--on-light, #f0e3c8) var(--on-dark, #443419)) var(--on-lab, var(--on-light, #f0e3c8) var(--on-dark, #38301c));
-  --success-tint: var(--on-default, var(--on-light, #d9e5ec) var(--on-dark, #223640)) var(--on-lab, var(--on-light, #d9e5ec) var(--on-dark, #1c2c36));
-  --data-6: var(--on-default, var(--on-light, #2a2520) var(--on-dark, #efe8dc)) var(--on-lab, var(--on-light, #1c1c1a) var(--on-dark, #e9e8e4));
-  --scrim: var(--on-default, var(--on-light, rgba(42, 37, 32, 0.5)) var(--on-dark, rgba(0, 0, 0, 0.6))) var(--on-lab, var(--on-light, rgba(20, 20, 20, 0.5)) var(--on-dark, rgba(0, 0, 0, 0.6)));
-  --stage: var(--on-default, var(--on-light, #121110) var(--on-dark, #121110)) var(--on-lab, var(--on-light, #131415) var(--on-dark, #131415));
-  --overlay: var(--on-default, var(--on-light, rgba(18, 17, 16, 0.86)) var(--on-dark, rgba(18, 17, 16, 0.86))) var(--on-lab, var(--on-light, rgba(19, 20, 21, 0.86)) var(--on-dark, rgba(19, 20, 21, 0.86)));
-  --overlay-ink: var(--on-default, var(--on-light, #efe8dc) var(--on-dark, #efe8dc)) var(--on-lab, var(--on-light, #e9e8e4) var(--on-dark, #e9e8e4));
-  --overlay-muted: var(--on-default, var(--on-light, #b3a897) var(--on-dark, #b3a897)) var(--on-lab, var(--on-light, #a3a29d) var(--on-dark, #a3a29d));
-  --overlay-line: var(--on-default, var(--on-light, rgba(239, 232, 220, 0.18)) var(--on-dark, rgba(239, 232, 220, 0.18))) var(--on-lab, var(--on-light, rgba(233, 232, 228, 0.18)) var(--on-dark, rgba(233, 232, 228, 0.18)));
-  --shadow-overlay: var(--on-default, var(--on-light, 0 8px 24px rgba(42, 37, 32, 0.18)) var(--on-dark, 0 8px 24px rgba(0, 0, 0, 0.55))) var(--on-lab, var(--on-light, 0 8px 24px rgba(20, 20, 20, 0.16)) var(--on-dark, 0 8px 24px rgba(0, 0, 0, 0.55)));
+  --surface: var(--on-default, var(--on-light, #ffffff) var(--on-dark, #0b0b0d)) var(--on-lab, var(--on-light, #f6f6f8) var(--on-dark, #0e0e11));
+  --surface-panel: var(--on-default, var(--on-light, #f3f3f5) var(--on-dark, #17171a)) var(--on-lab, var(--on-light, #ececef) var(--on-dark, #18181c));
+  --surface-raised: var(--on-default, var(--on-light, #ffffff) var(--on-dark, #1e1e22)) var(--on-lab, var(--on-light, #ffffff) var(--on-dark, #1b1b1f));
+  --surface-overlay: var(--on-default, var(--on-light, #ffffff) var(--on-dark, #25252a)) var(--on-lab, var(--on-light, #ffffff) var(--on-dark, #26262b));
+  --ink: var(--on-default, var(--on-light, #0b0b0d) var(--on-dark, #f4f4f6)) var(--on-lab, var(--on-light, #0b0b0d) var(--on-dark, #f4f4f6));
+  --ink-muted: var(--on-default, var(--on-light, #55555c) var(--on-dark, #a4a4ac)) var(--on-lab, var(--on-light, #55555c) var(--on-dark, #a4a4ac));
+  --ink-disabled: var(--on-default, var(--on-light, #a6a6ad) var(--on-dark, #5f5f66)) var(--on-lab, var(--on-light, #a6a6ad) var(--on-dark, #5f5f66));
+  --line: var(--on-default, var(--on-light, #e2e2e7) var(--on-dark, #2c2c32)) var(--on-lab, var(--on-light, #dcdce1) var(--on-dark, #2c2c32));
+  --wash: var(--on-default, var(--on-light, rgba(11, 11, 13, 0.06)) var(--on-dark, rgba(244, 244, 246, 0.08))) var(--on-lab, var(--on-light, rgba(11, 11, 13, 0.06)) var(--on-dark, rgba(244, 244, 246, 0.08)));
+  --primary-tint: var(--on-default, var(--on-light, #ece7ff) var(--on-dark, #251b4d)) var(--on-lab, var(--on-light, #ece7ff) var(--on-dark, #251b4d));
+  --danger-tint: var(--on-default, var(--on-light, #fde3e7) var(--on-dark, #45141f)) var(--on-lab, var(--on-light, #fde3e7) var(--on-dark, #45141f));
+  --warning-tint: var(--on-default, var(--on-light, #fbefcc) var(--on-dark, #382c08)) var(--on-lab, var(--on-light, #fbefcc) var(--on-dark, #382c08));
+  --success-tint: var(--on-default, var(--on-light, #dcebf5) var(--on-dark, #13303f)) var(--on-lab, var(--on-light, #dcebf5) var(--on-dark, #13303f));
+  --data-6: var(--on-default, var(--on-light, #0b0b0d) var(--on-dark, #f4f4f6)) var(--on-lab, var(--on-light, #0b0b0d) var(--on-dark, #f4f4f6));
+  --scrim: var(--on-default, var(--on-light, rgba(11, 11, 13, 0.5)) var(--on-dark, rgba(0, 0, 0, 0.6))) var(--on-lab, var(--on-light, rgba(11, 11, 13, 0.5)) var(--on-dark, rgba(0, 0, 0, 0.6)));
+  --stage: var(--on-default, var(--on-light, #0b0b0d) var(--on-dark, #0b0b0d)) var(--on-lab, var(--on-light, #0b0b0d) var(--on-dark, #0b0b0d));
+  --overlay: var(--on-default, var(--on-light, rgba(11, 11, 13, 0.86)) var(--on-dark, rgba(11, 11, 13, 0.86))) var(--on-lab, var(--on-light, rgba(11, 11, 13, 0.86)) var(--on-dark, rgba(11, 11, 13, 0.86)));
+  --overlay-ink: var(--on-default, var(--on-light, #f4f4f6) var(--on-dark, #f4f4f6)) var(--on-lab, var(--on-light, #f4f4f6) var(--on-dark, #f4f4f6));
+  --overlay-muted: var(--on-default, var(--on-light, #a4a4ac) var(--on-dark, #a4a4ac)) var(--on-lab, var(--on-light, #a4a4ac) var(--on-dark, #a4a4ac));
+  --overlay-line: var(--on-default, var(--on-light, rgba(244, 244, 246, 0.18)) var(--on-dark, rgba(244, 244, 246, 0.18))) var(--on-lab, var(--on-light, rgba(244, 244, 246, 0.18)) var(--on-dark, rgba(244, 244, 246, 0.18)));
+  --shadow-overlay: var(--on-default, var(--on-light, 0 8px 24px rgba(11, 11, 13, 0.16)) var(--on-dark, 0 8px 24px rgba(0, 0, 0, 0.6))) var(--on-lab, var(--on-light, 0 8px 24px rgba(11, 11, 13, 0.16)) var(--on-dark, 0 8px 24px rgba(0, 0, 0, 0.6)));
   --focus-halo: var(--surface-raised);
   --overlay-focus-halo: var(--stage);
   font-variant-numeric: var(--on-default, normal) var(--on-lab, tabular-nums);
